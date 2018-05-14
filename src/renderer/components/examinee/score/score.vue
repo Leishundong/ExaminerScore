@@ -105,6 +105,7 @@
         data(){
             return{
                 Show:{
+                    enter:false,
                     dialogScore:true,//控制Dialog的显示影藏
                     showInformation:false,//控制Dialog中考生信息的显示隐藏
                     isshow:false,//控制右下成绩栏的显示影藏
@@ -577,21 +578,26 @@
             //查找考生信息
             findExaminee(){
                 //根据考号查找
-                this.$examineedb.find({[registerNumber]:this.DialogGroup.examineeRegisterNumber}).exec((err,docs)=>{
-                    if(docs != ''){
-                        this.DialogGroup.examineeName = docs[0][examineeName];
-                        this.DialogGroup.examineeIdCard= docs[0][examineeIdCard];
-                        this.DialogGroup.group = docs[0][postGroup];
-                        this.SaveData.Achievement = docs[0];
-                        //控制模态框中考生信息显示与否
-                        if(this.DialogGroup.examineeName !=''&&this.DialogGroup.examineeIdCard !=''){
-                            this.Show.showInformation = true;
+                if(this.Show.enter==false){
+                    this.$examineedb.find({[registerNumber]:this.DialogGroup.examineeRegisterNumber}).exec((err,docs)=>{
+                        if(docs != ''){
+                            this.DialogGroup.examineeName = docs[0][examineeName];
+                            this.DialogGroup.examineeIdCard= docs[0][examineeIdCard];
+                            this.DialogGroup.group = docs[0][postGroup];
+                            this.SaveData.Achievement = docs[0];
+                            //控制模态框中考生信息显示与否
+                            if(this.DialogGroup.examineeName !=''&&this.DialogGroup.examineeIdCard !=''){
+                                this.Show.showInformation = true;
+                            }
+                        }else {
+                            this.$alert("查无此人，请先核对考生名单！");
+                            this.Show.enter=true;
+                            this.DialogGroup.examineeRegisterNumber='';
                         }
-                    }else {
-                        if(this.$confirm("查无此人，请先核对考生名单！")){
-                        }else {return}
-                    }
-                })
+                    })
+                }else {
+                    this.Show.enter = false;
+                }
             },
             //对右上角考生信息栏赋值
             confirmInformation(){

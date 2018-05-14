@@ -30,7 +30,7 @@
         <div class="table-box">
             <div class="import">
                 <p>评分要素：<input ref="4" :value="factor[factorNumber]" disabled />
-                    <span>要素权重：</span><input v-model="factorgroup.weight" @focus="inputFocus"  ref="5" @blur="BlurInputsd" @keyup.13="focusNextInputFive();"/>
+                    <span>要素权重：</span><input v-model="factorgroup.weight" @focus="inputFocus"  ref="5" @blur="BlurInputsd" @keyup.13="focusNextInputFive()"/>
                 </p>
                 <p>分数上限：<input v-model="factorgroup.toplimit" @focus="inputFocus" ref="6"  @keyup.13="add" /></p>
                 <div class="button-box">

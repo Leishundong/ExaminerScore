@@ -35,7 +35,7 @@
                     </div>
                     <div class="two" :style="left">
                         <span>核分员:</span>
-                        <input type="text" style="text-align: center" v-model="Roomgroup.examinerName[Roomgroup.examinertitle.length+1]" @focus="inputFocus" ref="check" />
+                        <input type="text" style="text-align: center" v-model="Roomgroup.examinerName[Roomgroup.examinertitle.length+1]" @focus="inputFocus" ref="check" @keyup.13="setExaminer" />
                     </div>
                 </div>
                 <span class="Examiner-button" @click="setExaminer">确定</span>
@@ -56,7 +56,8 @@
                     Rshow:true,
                     Eshow:true,
                     Cshow:false,
-                    showroom:true
+                    showroom:true,
+                    enter:false,
                 },
                 AddressGroup:{
                     roomNumber:[],
@@ -192,33 +193,38 @@
                 }
             },
             setExaminer(){
-               for(var i=0;i<this.Roomgroup.examinerName.length;i++){
-                   if(i==this.Roomgroup.examinerName.length-2){
-                       this.Roomgroup.examiner.push({
-                           Number: i+1,
-                           scorerName: this.Roomgroup.examinerName[i]
-                       })
-                   }else if(i==this.Roomgroup.examinerName.length-1){
-                       this.Roomgroup.examiner.push({
-                           Number: i+1,
-                           checkName: this.Roomgroup.examinerName[i]
-                       })
-                   }else {
-                       this.Roomgroup.examiner.push({
-                           Number: i+1,
-                           Name: this.Roomgroup.examinerName[i]
-                       })
-                   }
-               }
-                this.Roomgroup.examinerName = [];
-                this.$examinerdb.remove({}, {multi: true}, function (err, Examinerdocs) {
-                });
-                this.$examinerdb.insert(this.Roomgroup.examiner,(err,Examinerdocs)=> {
-                    this.Roomgroup.examiner = [];
-                    if(Examinerdocs != '' && Examinerdocs != null){
-                       this.$router.push({name:'score'})
-                   }
-               })
+                if(this.show.enter ==false){
+                    for(var i=0;i<this.Roomgroup.examinerName.length;i++){
+                        if(i==this.Roomgroup.examinerName.length-2){
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                scorerName: this.Roomgroup.examinerName[i]
+                            })
+                        }else if(i==this.Roomgroup.examinerName.length-1){
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                checkName: this.Roomgroup.examinerName[i]
+                            })
+                        }else {
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                Name: this.Roomgroup.examinerName[i]
+                            })
+                        }
+                    }
+                    this.Roomgroup.examinerName = [];
+                    this.$examinerdb.remove({}, {multi: true}, function (err, Examinerdocs) {
+                    });
+                    this.$examinerdb.insert(this.Roomgroup.examiner,(err,Examinerdocs)=> {
+                        this.Roomgroup.examiner = [];
+                        if(Examinerdocs != '' && Examinerdocs != null){
+                            this.$alert("考官设置成功");
+                            this.show.enter = true;
+                        }
+                    })
+                }else {
+                    this.show.enter = false;
+                }
             },
             ConfirmRoom(){
                if(this.select.val != ''){

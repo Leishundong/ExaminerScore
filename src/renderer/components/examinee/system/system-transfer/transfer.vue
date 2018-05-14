@@ -21,10 +21,10 @@
         </div>
         <div class="modify-box">
             <div class="modify" >
-                <p>上报文件密码：<input v-model="codeKey" type="password"/></p>
-                <p style="margin-left: 40px">再次确认：<input v-model="copyKey" type="password"/></p>
+                <p>上报文件密码：<input v-model="codeKey" type="password" @keyup.13="NextInput()"/></p>
+                <p style="margin-left: 40px">再次确认：<input v-model="copyKey" ref="1" type="password" @keyup.13="confirmKey()"/></p>
                 <p style="font-size: 18px;color: #ff2e2a;position: absolute;margin-left: 480px;margin-top: 15px" v-if="!(codeKey==copyKey)">两次输入的密码不一致</p>
-                <span  style="width: 110px" @click="confirmKey">确认</span><span style="margin-left: 80px;width: 120px" @click="resetKey">重置密码</span>
+                <span  style="width: 110px" @click="confirmKey">确认</span><span style="margin-left: 80px;width: 120px" @click="resetKey">默认密码</span>
             </div>
         </div>
     </div>
@@ -45,6 +45,7 @@
         },
         data(){
             return{
+                enter:false,
                 Achievement:[],
                 ExaminerScore:[],
                 SummarisesScore:[],
@@ -76,21 +77,32 @@
             });
         },
         methods:{
+            NextInput(){
+                this.$refs[1].focus();
+            },
             confirmKey(){
-                if(this.codeKey!=''){
-                    this.$modify.setpassword(this.codeKey);
-                    if(this.codeKey == this.$modify.password){
-                        this.$alert('输入上报密码成功。');
-                        this.codeKey = '';
-                        this.copyKey = '';
+                if(this.enter==false){
+                    if(this.codeKey!=''){
+                        this.$modify.setpassword(this.codeKey);
+                        if(this.codeKey == this.$modify.password){
+                            this.$alert('输入上报密码成功。');
+                            this.enter = true;
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }else {
+                            this.$alert('输入失败。');
+                            this.enter = true;
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }
                     }else {
-                        this.$alert('输入失败。');
-                        this.codeKey = '';
-                        this.copyKey = '';
+                        this.$alert('请先输入上报文件密码。');
+                        this.enter = true;
                     }
                 }else {
-                    this.$alert('请先输入上报文件密码。');
+                    this.enter = false;
                 }
+
             },
             getSystem(){
                 this.$ruledb.find().exec((err,docs)=>{
@@ -478,19 +490,21 @@
                 })
             },
             resetKey(){
-                this.$prompt('请先输入原始密码', '重置密码', {
+                this.$prompt('确定使用默认密码？(是或否)', '默认密码', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    inputType:'password',
+                    inputType:'text',
                     beforeClose:(action, instance, done)=>{
                         if(action==='confirm'){
-                            if(instance.inputValue == '123456'){
-                                this.$modify.setpassword(instance.inputValue);
-                                this.$message.success('重置成功，密码还原为原始密码');
+                            if(instance.inputValue == '是'){
+                                this.$modify.setpassword("d6F3Efeq");
+                                this.$message.success('设置成功，密码设为默认密码');
                                 done();
-                            }
-                            else{
-                                this.$message.error('请输正确密码');
+                            }else if(instance.inputValue == '否'){
+                                this.$message.error('取消操作');
+                                done();
+                            } else{
+                                this.$message.error('请进行正确回答');
                                 done();
                             }
                         }

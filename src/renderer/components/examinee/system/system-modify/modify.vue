@@ -5,7 +5,7 @@
                 <input ref="1" v-model="names" @keyup.13="nextInput">
             <div class="time">
                 <span>修改标语时间:</span>
-                <input v-model="times" ref="2" />
+                <input v-model="times" ref="2" @keyup.13="modify" />
             </div>
             <span class="span-button" @click="modify">完成</span>
         </div>
@@ -17,6 +17,7 @@
         name: "modify",
         data(){
             return{
+                enter:false,
                 names:'',
                 times:'',
                 a:0,
@@ -27,21 +28,26 @@
                 this.$refs[2].focus();
             },
             modify(){
-               if(this.names!=''&&this.times!=''){
-                   this.a = 1;
-                   this.$modify.setname(this.names);
-                   this.$modify.settime(this.times);
-                  if(this.a==1){
-                      if(this.$confirm("修改成功")){
-                          this.$router.push({
-                              path:this.$route.fullPath, // 获取当前连接，重新跳转
-                              query:{
-                                  _time:new Date().getTime()/1000  // 时间戳，刷新当前router
-                              }
-                          })
-                      }else {}
-                  }
-               }
+                if(this.enter == false){
+                    if(this.names!=''&&this.times!=''){
+                        this.a = 1;
+                        this.$modify.setname(this.names);
+                        this.$modify.settime(this.times);
+                        if(this.a==1){
+                            if(this.$confirm("修改成功")){
+                                this.$router.push({
+                                    path:this.$route.fullPath, // 获取当前连接，重新跳转
+                                    query:{
+                                        _time:new Date().getTime()/1000  // 时间戳，刷新当前router
+                                    }
+                                });
+                                this.enter = true;
+                            }else {}
+                        }
+                    }
+                }else {
+                    this.enter = false;
+                }
             }
         }
     }
