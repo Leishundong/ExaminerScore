@@ -5,7 +5,7 @@ export default {
     judgement:0,
     judgeSystem:0,
     algorithm : 'aes-256-ctr',
-    password : '123456',
+    password : '',
     /*d6F3Efeq*/
 
     s2ab(s) {

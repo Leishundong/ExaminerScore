@@ -30,7 +30,11 @@
                 this.$emit('on-selected-file', this.excelData)
             },
             handleUpload() {
-                document.getElementById('excel-upload-input2').click();
+                if(modify.password!=''){
+                    document.getElementById('excel-upload-input2').click();
+                }else {
+                    this.$alert('请先输入加密密码。')
+                }
             },
             handkeFileChange(e) {
                 var fileLength = 0;

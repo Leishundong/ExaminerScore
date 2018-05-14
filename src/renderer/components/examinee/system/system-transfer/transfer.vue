@@ -407,43 +407,47 @@
                 }
             },
             encryptoExport(){
-                if(this.ExaminerScore!=''&&this.SummarisesScore!=''&&this.titles!=''&&this.encryptoSaveName!=''){
-                    require.ensure([], () => {
-                        let NewSummarisesScore = [];
-                        for (var i=0;i<this.SummarisesScore.length;i++){
-                            var flag = true;
-                            for(var j=0;j<NewSummarisesScore.length;j++){
-                                if(this.SummarisesScore[i]['准考证号'] == NewSummarisesScore[j]['准考证号']){
-                                    flag = false;
+                if(this.$modify.password!=''){
+                    if(this.ExaminerScore!=''&&this.SummarisesScore!=''&&this.titles!=''&&this.encryptoSaveName!=''){
+                        require.ensure([], () => {
+                            let NewSummarisesScore = [];
+                            for (var i=0;i<this.SummarisesScore.length;i++){
+                                var flag = true;
+                                for(var j=0;j<NewSummarisesScore.length;j++){
+                                    if(this.SummarisesScore[i]['准考证号'] == NewSummarisesScore[j]['准考证号']){
+                                        flag = false;
+                                    };
                                 };
-                            };
-                            if(flag){
-                                NewSummarisesScore.push(this.SummarisesScore[i]);
-                            };
-                        }
-                        const { encrypto_export_json_to_excel } = require('@/vendor/Export2Excel');
-                        const tHeader = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
-                        const filterVal = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
-                        const list = NewSummarisesScore;
-                        const sheetName = '面试成绩';
-                        const data = this.formatJson(filterVal, list);
-                        encrypto_export_json_to_excel(tHeader, data, sheetName);
-                        const tHeader1 = this.titles;
-                        const filterVal1 = this.titles;
-                        const list1 = this.ExaminerScore;
-                        const sheetName1 = '考官评分';
-                        const title = this.encryptoSaveName;
-                        const data1 = this.formatJson(filterVal1, list1);
-                        encrypto_export_json_to_excel(tHeader1, data1, sheetName1,title,1 );
-                    });
-                    this.$achievement.remove({},{multi:true},function (err,ExaminerRemove) {
-                    });
-                    this.$examinerScore.remove({},{multi:true},function (err,ExaminerRemove) {
-                    });
-                    this.$modify.setjudgement(1);
+                                if(flag){
+                                    NewSummarisesScore.push(this.SummarisesScore[i]);
+                                };
+                            }
+                            const { encrypto_export_json_to_excel } = require('@/vendor/Export2Excel');
+                            const tHeader = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
+                            const filterVal = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
+                            const list = NewSummarisesScore;
+                            const sheetName = '面试成绩';
+                            const data = this.formatJson(filterVal, list);
+                            encrypto_export_json_to_excel(tHeader, data, sheetName);
+                            const tHeader1 = this.titles;
+                            const filterVal1 = this.titles;
+                            const list1 = this.ExaminerScore;
+                            const sheetName1 = '考官评分';
+                            const title = this.encryptoSaveName;
+                            const data1 = this.formatJson(filterVal1, list1);
+                            encrypto_export_json_to_excel(tHeader1, data1, sheetName1,title,1 );
+                        });
+                        this.$achievement.remove({},{multi:true},function (err,ExaminerRemove) {
+                        });
+                        this.$examinerScore.remove({},{multi:true},function (err,ExaminerRemove) {
+                        });
+                        this.$modify.setjudgement(1);
+                    }else {
+                        if(this.$confirm("导出数据不完全！")){
+                        }else {}
+                    }
                 }else {
-                    if(this.$confirm("导出数据不完全！")){
-                    }else {}
+                    this.$alert('请先设置加密密码。')
                 }
             },
             formatJson(filterVal, jsonData) {
