@@ -4,7 +4,6 @@ require('script-loader!vendor/Blob');
 require('script-loader!xlsx/dist/xlsx.core.min');
 var JSZip = require('jszip');
 var modify = require('../config');
-/*console.log(modify.default.ab2s());*/
 function generateArray(table) {
     var out = [];
     var rows = table.querySelectorAll('tr');
