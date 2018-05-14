@@ -24,7 +24,7 @@
                 <p>上报文件密码：<input v-model="codeKey" type="password"/></p>
                 <p style="margin-left: 40px">再次确认：<input v-model="copyKey" type="password"/></p>
                 <p style="font-size: 18px;color: #ff2e2a;position: absolute;margin-left: 480px;margin-top: 15px" v-if="!(codeKey==copyKey)">两次输入的密码不一致</p>
-                <span @click="modifyKey" style="width: 110px">确认</span><span style="margin-left: 80px;width: 120px" @click="resetKey">重置密码</span>
+                <span  style="width: 110px" @click="confirmKey">确认</span><span style="margin-left: 80px;width: 120px" @click="resetKey">重置密码</span>
             </div>
         </div>
     </div>
@@ -76,6 +76,22 @@
             });
         },
         methods:{
+            confirmKey(){
+                if(this.codeKey!=''){
+                    this.$modify.setpassword(this.codeKey);
+                    if(this.codeKey == this.$modify.password){
+                        this.$alert('输入上报密码成功。');
+                        this.codeKey = '';
+                        this.copyKey = '';
+                    }else {
+                        this.$alert('输入失败。');
+                        this.codeKey = '';
+                        this.copyKey = '';
+                    }
+                }else {
+                    this.$alert('请先输入上报文件密码。');
+                }
+            },
             getSystem(){
                 this.$ruledb.find().exec((err,docs)=>{
                     if(docs!=''){
@@ -242,7 +258,7 @@
                     });
                     results = {};
                 }else {
-                    this.$alert('导入格式不正确');
+                    this.$alert('导入格式不正确或密码不正确');
                 }
                 /*this.$reportAcievement.find().exec((err,docs)=>{
                     console.log(docs);
@@ -465,7 +481,7 @@
                     beforeClose:(action, instance, done)=>{
                         if(action==='confirm'){
                             if(instance.inputValue == '123456'){
-                                this.Key = '123456';
+                                this.$modify.setpassword(instance.inputValue);
                                 this.$message.success('重置成功，密码还原为原始密码');
                                 done();
                             }

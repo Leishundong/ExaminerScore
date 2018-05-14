@@ -5,7 +5,8 @@ export default {
     judgement:0,
     judgeSystem:0,
     algorithm : 'aes-256-ctr',
-    password : 'd6F3Efeq',
+    password : '123456',
+    /*d6F3Efeq*/
 
     s2ab(s) {
         var buf = new ArrayBuffer(s.length);
@@ -40,5 +41,8 @@ export default {
     },
     setjudgeSystem(NewSystem){
         this.judgeSystem = NewSystem
-    }
+    },
+    setpassword(newPassword){
+        this.password = newPassword
+    },
 }
