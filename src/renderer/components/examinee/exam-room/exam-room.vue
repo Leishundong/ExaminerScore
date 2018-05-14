@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="exam-button" v-show="show.btn">
-            <button type="button" class="room-button" @click="Roomcity">请选择面试点与面试室</button>
+            <button type="button" class="room-button" @click="Roomcity" :disabled="show.showroom">请选择面试点与面试室</button>
         </div>
         <div v-if="!show.btn">
             <div class="City-group ys1" v-if="!show.Cshow">
@@ -56,6 +56,7 @@
                     Rshow:true,
                     Eshow:true,
                     Cshow:false,
+                    showroom:true
                 },
                 AddressGroup:{
                     roomNumber:[],
@@ -108,6 +109,7 @@
             })
         },
         activated(){
+            this.show.showroom=true;
             this.show.btn = true;
             this.show.Rshow = true;
             this.show.Eshow = true;
@@ -115,7 +117,6 @@
             this.AddressGroup.roomNumber=[];
             this.Roomgroup.examinertitle=[];
             this.determineRoom();
-            this.getExaminer();
         } ,
         methods:{
             inputFocus(el){
@@ -136,6 +137,17 @@
                    this.$dbRoom.find({}).sort({[RoomCode]:1}).exec((err,docs)=>{
                        let determineRoom = docs;
                        if(determineRoom!=''){
+                           this.$ruledb.find({}).exec((err,docs)=>{
+                               if(docs!='' && docs != null){
+                                   this.show.showroom = false;
+                                   let ExaminerNumber = parseInt(docs[0].examinerNumber);
+                                   for(var i=1;i<=ExaminerNumber;i++){
+                                       this.Roomgroup.examinertitle[i-1] = '考官'+i;
+                                   }
+                               }else {
+                                   this.$alert('请先前往系统设置设置考官人数！');
+                               }0
+                           })
                        }else {
                            this.$alert('请先前往系统设置导入考试室信息！');
                        }
@@ -178,16 +190,6 @@
                 }else {
                     return
                 }
-            },
-            getExaminer(){
-                this.$ruledb.find({}).exec((err,docs)=>{
-                    if(docs!='' && docs != null){
-                        let ExaminerNumber = parseInt(docs[0].examinerNumber);
-                        for(var i=1;i<=ExaminerNumber;i++){
-                            this.Roomgroup.examinertitle[i-1] = '考官'+i;
-                        }
-                    }
-                })
             },
             setExaminer(){
                for(var i=0;i<this.Roomgroup.examinerName.length;i++){
