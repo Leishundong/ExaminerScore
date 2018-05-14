@@ -45,7 +45,6 @@
         },
         data(){
             return{
-                a:1,
                 Achievement:[],
                 ExaminerScore:[],
                 SummarisesScore:[],
@@ -392,7 +391,7 @@
                 }
             },
             encryptoExport(){
-                if(this.ExaminerScore!=''&&this.SummarisesScore!=''&&this.titles!=''&&this.encryptoSaveName!=''&&this.a==1){
+                if(this.ExaminerScore!=''&&this.SummarisesScore!=''&&this.titles!=''&&this.encryptoSaveName!=''){
                     require.ensure([], () => {
                         let NewSummarisesScore = [];
                         for (var i=0;i<this.SummarisesScore.length;i++){
@@ -426,9 +425,8 @@
                     this.$examinerScore.remove({},{multi:true},function (err,ExaminerRemove) {
                     });
                     this.$modify.setjudgement(1);
-                    this.a=0;
                 }else {
-                    if(this.$confirm("导出数据不完全！或重复导出上报文件")){
+                    if(this.$confirm("导出数据不完全！")){
                     }else {}
                 }
             },
