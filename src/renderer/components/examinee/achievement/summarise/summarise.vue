@@ -1,7 +1,7 @@
 <template>
     <div class="interview-achievement">
         <div class="head-box">
-            <input type="text" v-model="SearchKey" @focus="inputFocus" @keyup.13="search"/>
+            <input type="text" v-model="SearchKey" @focus="inputFocus" @keyup.13="Keysearch"/>
             <span class="interview-button"  @click="search">搜索</span>
             <span>可以按照准考证号查找</span>
         </div>
@@ -82,6 +82,20 @@
                });
            },
            search(){
+                   this.$examinerScore.find({'准考证号':this.SearchKey}).sort({'考官序号':1}).exec((err,docs)=>{
+                       if(docs != null&&docs != ''){
+                           this.ExaminerScore = [];
+                           this.ExaminerScore = docs;
+                           this.allindex = docs.length;
+                           this.allpage = Math.ceil(docs.length/7);
+                           this.pages(this.ExaminerScore);
+                       }else {
+                           this.$alert('请输入正确的关键字或数据为空！');
+                           this.SearchKey='';
+                       };
+                   })
+           },
+           Keysearch(){
                if(this.enter==false){
                    this.$examinerScore.find({'准考证号':this.SearchKey}).sort({'考官序号':1}).exec((err,docs)=>{
                        if(docs != null&&docs != ''){
@@ -171,6 +185,7 @@
                 color:rgb(36,36,36);
             }
             .interview-button{
+                cursor:pointer;
                 font-size: 17px;
                 text-align: center;
                 display: inline-block;
@@ -234,6 +249,7 @@
             .foot-button-group{
                 margin-left: 25px;
                 .foot-button{
+                    cursor:pointer;
                     font-size: 17px;
                     text-align: center;
                     display: inline-block;

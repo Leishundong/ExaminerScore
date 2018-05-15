@@ -1,7 +1,7 @@
 <template>
     <div class="transfer">
         <div class="instance-box" >
-            <div class="instance" style="margin: auto">
+            <div class="instance">
                 <upload-excel  @on-selected-file='selected'></upload-excel>
                 <upload-excels  @on-selected-file='importRoom'></upload-excels>
                 <span class="span-button" style="background: rgb(167,217,77);margin-left: 25px" @click="exports">导出数据到xls</span>
@@ -22,9 +22,10 @@
         <div class="modify-box">
             <div class="modify" >
                 <p>上报文件密码：<input v-model="codeKey" type="password" @keyup.13="NextInput()"/></p>
-                <p style="margin-left: 40px">再次确认：<input v-model="copyKey" ref="1" type="password" @keyup.13="confirmKey()"/></p>
+                <p style="margin-left: 40px">再次确认：<input v-model="copyKey" ref="1" type="password" @keyup.13="KeyconfirmKey"/></p>
                 <p style="font-size: 18px;color: #ff2e2a;position: absolute;margin-left: 480px;margin-top: 15px" v-if="!(codeKey==copyKey)">两次输入的密码不一致</p>
-                <span  style="width: 110px" @click="confirmKey">确认</span><span style="margin-left: 80px;width: 120px" @click="resetKey">默认密码</span>
+                <el-button type="primary" class="button" style="width: 110px" @click="confirmKey" :disabled="isadd">确定</el-button>
+                <span style="margin-left: 80px;width: 120px" @click="resetKey">默认密码</span>
             </div>
         </div>
     </div>
@@ -64,6 +65,13 @@
             }
         },
         computed:{
+            isadd(){
+                if(this.codeKey!=''&&this.copyKey!=''&&this.codeKey==this.copyKey){
+                    return false
+                }else {
+                    return true
+                }
+            }
         },
         activated(){
         },
@@ -81,22 +89,38 @@
                 this.$refs[1].focus();
             },
             confirmKey(){
+                    if(this.codeKey!=''){
+                        this.$modify.setpassword(this.codeKey);
+                        if(this.codeKey == this.$modify.password){
+                            this.$alert('输入上报密码成功');
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }else {
+                            this.$alert('输入失败');
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }
+                    }else {
+                        this.$alert('请先输入上报文件密码');
+                    }
+            },
+            KeyconfirmKey(){
                 if(this.enter==false){
                     if(this.codeKey!=''){
                         this.$modify.setpassword(this.codeKey);
                         if(this.codeKey == this.$modify.password){
-                            this.$alert('输入上报密码成功。');
+                            this.$alert('输入上报密码成功');
                             this.enter = true;
                             this.codeKey = '';
                             this.copyKey = '';
                         }else {
-                            this.$alert('输入失败。');
+                            this.$alert('输入失败');
                             this.enter = true;
                             this.codeKey = '';
                             this.copyKey = '';
                         }
                     }else {
-                        this.$alert('请先输入上报文件密码。');
+                        this.$alert('请先输入上报文件密码');
                         this.enter = true;
                     }
                 }else {
@@ -146,15 +170,20 @@
                     };
                 };
                 if(results[0].hasOwnProperty("应用单位")==true){
-                    this.$System.remove({},{multi:true},function (err,ExaminerRemove) {
+                    let messages = [];
+                    messages.push({
+                        unit: results[0]['应用单位'],
+                        time: results[0]['应用时间']
                     });
-                    this.$System.insert(results,(err,docs)=> {
-                        this.$modify.setname(docs[0]['应用单位']);
-                        this.$modify.settime(docs[0]['应用时间']);
+                    this.$Messages.remove({},{multi:true},function (err,ExaminerRemove) {
+                    });
+                    this.$Messages.insert(messages,(err,docs)=> {
+                        this.$modify.setname(docs[0]['unit']);
+                        this.$modify.settime(docs[0]['time']);
                         this.$router.push({
                             path:this.$route.fullPath, // 获取当前连接，重新跳转
                             query:{
-                                _time:new Date().getTime()/1000  // 时间戳，刷新当前router
+                                _time:new Date().getTime()/100000  // 时间戳，刷新当前router
                             }
                         })
                     });
@@ -465,55 +494,18 @@
             formatJson(filterVal, jsonData) {
                 return jsonData.map(v => filterVal.map(j => v[j]))
             },
-            modifyKey(){
-                this.$prompt('请先输入原密码', '修改密码', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputType:'password',
-                    beforeClose:(action, instance, done)=>{
-                        if(action==='confirm'){
-                            if(instance.inputValue == this.Key){
-                                this.Key = this.codeKey;
-                                this.$message.success('修改成功');
-                                done();
-                            }
-                            else{
-                                this.$message.error('请输正确密码');
-                                done();
-                            }
-                        }
-                        else{
-                            this.$message.info('取消输入，修改失败');
-                            done();
-                        }
-                    }
-                })
-            },
             resetKey(){
-                this.$prompt('确定使用默认密码？(是或否)', '默认密码', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputType:'text',
-                    beforeClose:(action, instance, done)=>{
-                        if(action==='confirm'){
-                            if(instance.inputValue == '是'){
-                                this.$modify.setpassword("d6F3Efeq");
-                                this.$message.success('设置成功，密码设为默认密码');
-                                done();
-                            }else if(instance.inputValue == '否'){
-                                this.$message.error('取消操作');
-                                done();
-                            } else{
-                                this.$message.error('请进行正确回答');
-                                done();
-                            }
+                this.$confirm('确定使用默认密码？')
+                    .then(_ => {
+                        this.$modify.setpassword("d6F3Efeq");
+                        if(this.$modify.password == 'd6F3Efeq'){
+                            this.$message.success('设置成功，密码设为默认密码'
+                            );}else {
+                            this.$message.error('设置失败，请自行设置密码')
                         }
-                        else{
-                            this.$message.info('取消输入，修改失败');
-                            done();
-                        }
-                    }
-                })
+                        done();
+                    })
+                    .catch(_ => {});
             },
         }
     }
@@ -531,6 +523,7 @@
         text-align: center;
         .span-button{
             float: left;
+            cursor:pointer;
             margin-left: 25px;
             margin-top: 10px;
             width: 170px;
@@ -542,10 +535,9 @@
             color: #fff;
         }
         .instance-box{
-            float: left;
-            width: 100%;
+            width: 90%;
+            margin-left: 9%;
             .instance{
-                margin: 0 auto;
             }
         }
         .modify-box{
@@ -565,7 +557,16 @@
                     border: #0086b3 1px solid;
                     border-radius: 5px;
                 }
+                .button{
+                    position: absolute;
+                    margin-top: 50px;
+                    margin-left: -180px;
+                    background: #0098FE;
+                    text-align: center;
+                    color: #fff;
+                }
                 span{
+                    cursor: pointer;
                     position: absolute;
                     margin-top: 50px;
                     margin-left: -180px;

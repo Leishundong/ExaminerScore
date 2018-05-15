@@ -2,7 +2,7 @@ import Vue from 'vue'
 import axios from 'axios'
 
 import App from './App'
-import {examineedb,dbRoom,setDb,setRoomdb,ruledb,factordb,examinerdb,cisPositiondb,examinerScore,achievement,addre,reportAcievement,reportExaminer,System} from './datastore';
+import {examineedb,dbRoom,setDb,setRoomdb,ruledb,factordb,examinerdb,cisPositiondb,examinerScore,achievement,addre,reportAcievement,reportExaminer,Messages} from './datastore';
 import { Button,MessageBox, Message,Radio,Select,Option,Input,Dialog,Pagination } from 'element-ui';
 import router from './router'
 import store from './store'
@@ -26,7 +26,7 @@ Vue.prototype.$achievement = achievement;
 Vue.prototype.$addre = addre;
 Vue.prototype.$reportAcievement = reportAcievement;
 Vue.prototype.$reportExaminer = reportExaminer;
-Vue.prototype.$System = System;
+Vue.prototype.$Messages = Messages;
 Vue.prototype.$modify = modify;
 
 Vue.use(Input);
@@ -52,3 +52,4 @@ new Vue({
   store,
   template: '<App/>'
 }).$mount('#app');
+

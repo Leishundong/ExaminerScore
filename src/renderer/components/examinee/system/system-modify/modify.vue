@@ -5,7 +5,7 @@
                 <input ref="1" v-model="names" @keyup.13="nextInput">
             <div class="time">
                 <span>修改标语时间:</span>
-                <input v-model="times" ref="2" @keyup.13="modify" />
+                <input v-model="times" ref="2" @keyup.13="Keymodify" />
             </div>
             <span class="span-button" @click="modify">完成</span>
         </div>
@@ -19,8 +19,7 @@
             return{
                 enter:false,
                 names:'',
-                times:'',
-                a:0,
+                times:''
             }
         },
         methods:{
@@ -28,12 +27,44 @@
                 this.$refs[2].focus();
             },
             modify(){
-                if(this.enter == false){
                     if(this.names!=''&&this.times!=''){
-                        this.a = 1;
+                        let Messages = [];
                         this.$modify.setname(this.names);
                         this.$modify.settime(this.times);
-                        if(this.a==1){
+                        Messages.push({
+                            unit:this.$modify.names,
+                            time:this.$modify.times,
+                        });
+                        this.$Messages.remove({},{multi:true},function (err,ExaminerRemove) {
+                        });
+                        this.$Messages.insert(Messages,(err,docs)=>{
+                        });
+                            if(this.$confirm("修改成功")){
+                                this.$router.push({
+                                    path:this.$route.fullPath, // 获取当前连接，重新跳转
+                                    query:{
+                                        _time:new Date().getTime()/1000  // 时间戳，刷新当前router
+                                    }
+                                });
+                            }else {}
+                    }else {
+                        this.$alert('请先输入完整数据')
+                    }
+            },
+            Keymodify(){
+                if(this.enter == false){
+                    if(this.names!=''&&this.times!=''){
+                        let Messages = [];
+                        this.$modify.setname(this.names);
+                        this.$modify.settime(this.times);
+                        Messages.push({
+                            unit:this.$modify.names,
+                            time:this.$modify.times,
+                        });
+                        this.$Messages.remove({},{multi:true},function (err,ExaminerRemove) {
+                        });
+                        this.$Messages.insert(Messages,(err,docs)=>{
+                        });
                             if(this.$confirm("修改成功")){
                                 this.$router.push({
                                     path:this.$route.fullPath, // 获取当前连接，重新跳转
@@ -42,8 +73,11 @@
                                     }
                                 });
                                 this.enter = true;
-                            }else {}
-                        }
+                            }
+
+                    }else {
+                        this.$alert('请先输入完整数据');
+                        this.enter = true;
                     }
                 }else {
                     this.enter = false;
@@ -61,6 +95,7 @@
             margin-top: 90px;
             .span-button{
                 float: left;
+                cursor: pointer;
                 margin-top: 20px;
                 margin-left: 65%;
                 color: #fff;

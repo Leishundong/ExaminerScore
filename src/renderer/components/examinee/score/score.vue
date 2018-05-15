@@ -14,7 +14,7 @@
                     <el-button type="primary"  class="custombutton" style="margin-left: 170px" @click="toNewGroup">开始新的一组</el-button>
                 </div>
                 <div>
-                    <p>请输入准考证号：<input class="pInput" @focus="inputFocus" v-model="DialogGroup.examineeRegisterNumber" :maxlength="Rulegroup.certificateLength" @keyup.13="findExaminee"><el-button type="primary" class="pButton" @click="findExaminee">查找</el-button></p>
+                    <p>请输入准考证号：<input class="pInput" @focus="inputFocus" v-model="DialogGroup.examineeRegisterNumber" :maxlength="Rulegroup.certificateLength" @keyup.13="KeyfindExaminee"><el-button type="primary" class="pButton" @click="findExaminee">查找</el-button></p>
                 </div>
                 <div v-if="Show.showInformation" style="position: absolute">
                     <p style="margin-top:32px">姓名：<span class="textinput">{{DialogGroup.examineeName}}</span></p>
@@ -88,7 +88,7 @@
                         <span>{{Information.achievement}}</span>
                     </div>
                     <div class="save-button">
-                        <span @click="save">保存</span>
+                        <span @click="save" style="cursor:pointer;">保存</span>
                     </div>
                 </div>
             </div>
@@ -205,6 +205,7 @@
                             factordocs.sort(compare("scoring"));
                             this.tableData.factor = factordocs; //绑定要素信息
                             this.$examinerdb.find({}).exec((err,examinerdocs)=>{
+                                console.log(examinerdocs);
                                 if(examinerdocs != ''){
                                     this.tableData.scores=[];
                                     //根据序号排序考官
@@ -264,6 +265,7 @@
                                     });
                                     this.$addre.find({}).exec((err,Addredocs)=>{
                                         if(Addredocs!=''){
+                                            console.log(Addredocs);
                                             this.tableData.Address = Addredocs[0].adress;
                                             this.SaveData.adressId = Addredocs[0].adressId;
                                         }else {
@@ -309,10 +311,11 @@
                     this.Show.isshow = false;
                     this.$modify.setjudgement(0);
                     this.tableData.SummariseMax='';
+                    this.Information.achievement = '';
                     this.tableData.SummariseMin='';
                     this.tableData.point = [];
                 }
-                if(Number(this.$modify.judgeSystem)==1){
+                if(this.$modify.judgeSystem==1){
                     this.tableData.point = [];
                     this.tableData.SummariseMax='';
                     this.tableData.SummariseMin='';
@@ -495,17 +498,18 @@
                 let avg = '';//用于返回的数
                 let a = 0;//同上，判断用
                 //通过循环获取同要素各个考官打分情况，并计算
-                for(var i=0;i<this.tableData.point.length;i++){
+                for(var i=0;i<this.tableData.scores.length;i++){
                     if(this.tableData.point[i][index] != null){ //确定考官已答打分
                         num += Number(this.tableData.point[i][index]);
                         a = a+1;
                         if(a == this.tableData.scores.length){   //判断是否将值传出
                             if(this.Rulegroup.extremum == true){//判断是否去掉最值
                                 num = num-Number(this.tableData.mx[index])-Number(this.tableData.mn[index]);
-                                nums = num/(this.tableData.point.length-2);
+                                nums = num/(this.tableData.scores.length-2);
+                                console.log(nums);
                                 this.Summarises.factorScore[index] = nums;
                             }else {
-                                nums = num/this.tableData.point.length;
+                                nums = num/this.tableData.scores.length;
                                 this.Summarises.factorScore[index] = nums;
                             }
                         }
@@ -577,6 +581,24 @@
             },*/
             //查找考生信息
             findExaminee(){
+                //根据考号查找
+                    this.$examineedb.find({[registerNumber]:this.DialogGroup.examineeRegisterNumber}).exec((err,docs)=>{
+                        if(docs != ''){
+                            this.DialogGroup.examineeName = docs[0][examineeName];
+                            this.DialogGroup.examineeIdCard= docs[0][examineeIdCard];
+                            this.DialogGroup.group = docs[0][postGroup];
+                            this.SaveData.Achievement = docs[0];
+                            //控制模态框中考生信息显示与否
+                            if(this.DialogGroup.examineeName !=''&&this.DialogGroup.examineeIdCard !=''){
+                                this.Show.showInformation = true;
+                            }
+                        }else {
+                            this.$alert("查无此人，请先核对考生名单！");
+                            this.DialogGroup.examineeRegisterNumber='';
+                        }
+                    })
+            },
+            KeyfindExaminee(){
                 //根据考号查找
                 if(this.Show.enter==false){
                     this.$examineedb.find({[registerNumber]:this.DialogGroup.examineeRegisterNumber}).exec((err,docs)=>{
@@ -1016,6 +1038,7 @@
                 text-align: center;
                 margin-top: 5px;
                 .compute{
+                    cursor:pointer;
                     width: 94px;
                     padding:5.5px 30px;
                     height: 31px;
@@ -1026,6 +1049,7 @@
                     font-family: adobe-regular;
                 }
                 .modify-number{
+
                     width: 94px;
                     margin-left: 28px;
                     padding:5.5px 30px;

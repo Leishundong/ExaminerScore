@@ -1,9 +1,10 @@
 var crypto = require('crypto')
 export default {
-    names: '2017年温州市各级机关单位考生录用公务员面试',
-    times:'2017年6月3日-4日',
+    names: '',
+    times:'',
     judgement:0,
     judgeSystem:0,
+    judgeRoom:0,
     algorithm : 'aes-256-ctr',
     password : '',
     /*d6F3Efeq*/
@@ -41,6 +42,9 @@ export default {
     },
     setjudgeSystem(NewSystem){
         this.judgeSystem = NewSystem
+    },
+    setjudgeRoom(judgeRoom){
+        this.judgeRoom = judgeRoom
     },
     setpassword(newPassword){
         this.password = newPassword
