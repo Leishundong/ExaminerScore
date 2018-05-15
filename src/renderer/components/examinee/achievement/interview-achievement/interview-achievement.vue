@@ -1,7 +1,7 @@
 <template>
     <div class="interview-achievement">
         <div class="head-box">
-            <input v-model="SearchKey" @keyup.13="Search"/>
+            <input v-model="SearchKey" @focus="inputFocus" @keyup.13="KeySearch"/>
             <span class="interview-button" @click="Search">搜索</span>
             <span>关键字可以是准考证号，面试组别，面试序号，姓名的任意一值</span>
         </div>
@@ -47,6 +47,7 @@
     export default {
         data(){
             return{
+                enter:false,
                 Achievement:[],
                 achievementPage:[],
                 allpage:'',
@@ -64,6 +65,9 @@
             this.getAchievement();
         },
         methods:{
+            inputFocus(el){
+                el.currentTarget.select();
+            },
             getAchievement(){
                 this.$achievement.find().sort({'面试组别':1,'面试序号':2}).exec((err,docs)=>{
                     this.Achievement = docs;
@@ -73,36 +77,73 @@
                 })
             },
             Search(){
-                this.$achievement.find({'准考证号':this.SearchKey}).sort({'面试组别':1,'面试序号':2}).exec((err,docs)=>{
-                    if(docs !=null && docs !=''){
-                        this.SearchFun(docs);
-                        this.SearchKey='';
-                    }else {
-                        this.$achievement.find({'面试组别':this.SearchKey}).sort({'面试序号':1}).exec((err,docs)=>{
-                            if(docs !=null && docs !=''){
-                                this.SearchFun(docs);
-                                this.SearchKey='';
-                            }else {
-                                this.$achievement.find({'面试序号':parseInt(this.SearchKey)}).sort({'面试组别':1}).exec((err,docs)=>{
-                                    if(docs !=null && docs !=''){
-                                        this.SearchFun(docs);
-                                        this.SearchKey='';
-                                    }else {
-                                        this.$achievement.find({'姓名':this.SearchKey}).exec((err,docs)=>{
-                                            if(docs !=null && docs !=''){
-                                                this.SearchFun(docs);
-                                                this.SearchKey='';
-                                            }else {
-                                                this.$alert('请输入正确的关键字或数据为空!')
-                                            };
+                    this.$achievement.find({'准考证号':this.SearchKey}).sort({'面试组别':1,'面试序号':2}).exec((err,docs)=>{
+                        if(docs !=null && docs !=''){
+                            this.SearchFun(docs);
+                            this.SearchKey='';
+                        }else {
+                            this.$achievement.find({'面试组别':this.SearchKey}).sort({'面试序号':1}).exec((err,docs)=>{
+                                if(docs !=null && docs !=''){
+                                    this.SearchFun(docs);
+                                    this.SearchKey='';
+                                }else {
+                                    this.$achievement.find({'面试序号':parseInt(this.SearchKey)}).sort({'面试组别':1}).exec((err,docs)=>{
+                                        if(docs !=null && docs !=''){
+                                            this.SearchFun(docs);
                                             this.SearchKey='';
-                                        })
-                                    }
-                                })
-                            }
-                        })
-                    }
-                })
+                                        }else {
+                                            this.$achievement.find({'姓名':this.SearchKey}).exec((err,docs)=>{
+                                                if(docs !=null && docs !=''){
+                                                    this.SearchFun(docs);
+                                                    this.SearchKey='';
+                                                }else {
+                                                    this.$alert('请输入正确的关键字或数据为空！');
+                                                };
+                                                this.SearchKey='';
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+            },
+            KeySearch(){
+                if(this.enter ==false){
+                    this.$achievement.find({'准考证号':this.SearchKey}).sort({'面试组别':1,'面试序号':2}).exec((err,docs)=>{
+                        if(docs !=null && docs !=''){
+                            this.SearchFun(docs);
+                            this.SearchKey='';
+                        }else {
+                            this.$achievement.find({'面试组别':this.SearchKey}).sort({'面试序号':1}).exec((err,docs)=>{
+                                if(docs !=null && docs !=''){
+                                    this.SearchFun(docs);
+                                    this.SearchKey='';
+                                }else {
+                                    this.$achievement.find({'面试序号':parseInt(this.SearchKey)}).sort({'面试组别':1}).exec((err,docs)=>{
+                                        if(docs !=null && docs !=''){
+                                            this.SearchFun(docs);
+                                            this.SearchKey='';
+                                        }else {
+                                            this.$achievement.find({'姓名':this.SearchKey}).exec((err,docs)=>{
+                                                if(docs !=null && docs !=''){
+                                                    this.SearchFun(docs);
+                                                    this.SearchKey='';
+                                                }else {
+                                                    this.$alert('请输入正确的关键字或数据为空！');
+                                                    this.enter = true;
+                                                };
+                                                this.SearchKey='';
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }else {
+                    this.enter = false;
+                }
             },
             SearchFun(doc){
                 this.Achievement = [];
@@ -182,6 +223,7 @@
                 color:rgb(36,36,36);
             }
             .interview-button{
+                cursor:pointer;
                 font-size: 17px;
                 text-align: center;
                 display: inline-block;
@@ -230,6 +272,7 @@
             .foot-button-group{
                 margin-left: 25px;
                 .foot-button{
+                    cursor:pointer;
                     font-size: 17px;
                     text-align: center;
                     display: inline-block;

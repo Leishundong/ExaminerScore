@@ -19,7 +19,25 @@
           }
       },
       created(){
-      }
+          this.$Messages.find().exec((err,docs)=>{
+              if(docs!=''){
+                  if(this.$modify.names==docs[0]['unit']&&this.$modify.times==docs[0]['time']){
+                      return
+                  }else {
+                      this.$modify.setname(docs[0]['unit']);
+                      this.$modify.settime(docs[0]['time']);
+                      this.$router.push({
+                          path:this.$route.fullPath, // 获取当前连接，重新跳转
+                          query:{
+                              _time:new Date().getTime()/1000000000000000  // 时间戳，刷新当前router
+                          }
+                      })
+                  }
+              }else {
+                  return
+              }
+          });
+      },
   }
 </script>
 

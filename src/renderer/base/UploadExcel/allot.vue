@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span @click="handleUpload">导入上报文件</span>
+        <span class="cur" @click="handleUpload">导入上报文件</span>
         <input id="excel-upload-input2" type="file" multiple="multiple" accept=".xlsx, .xls" class="c-hide" @change="handkeFileChange">
     </div>
 </template>

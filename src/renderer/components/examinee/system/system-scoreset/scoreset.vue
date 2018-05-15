@@ -24,13 +24,13 @@
                 </p>
             </div>
             <div style=" margin-top: 55px;">
-                <span type="button" class="final-set" @click="completeSet">完成设置</span>
+                <span  class="final-set" @click="completeSet">完成设置</span>
             </div>
         </div>
         <div class="table-box">
             <div class="import">
                 <p>评分要素：<input ref="4" :value="factor[factorNumber]" disabled />
-                    <span>要素权重：</span><input v-model="factorgroup.weight" @focus="inputFocus"  ref="5" @blur="BlurInputsd" @keyup.13="focusNextInputFive();"/>
+                    <span>要素权重：</span><input v-model="factorgroup.weight" @focus="inputFocus"  ref="5" @blur="BlurInputsd" @keyup.13="focusNextInputFive()"/>
                 </p>
                 <p>分数上限：<input v-model="factorgroup.toplimit" @focus="inputFocus" ref="6"  @keyup.13="add" /></p>
                 <div class="button-box">
@@ -225,7 +225,7 @@
             },
             completeSet(){
                 if(this.factorgroup.factor!=''&&this.rulegroup.examinerNumber!=''&&this.rulegroup.interviewWeight!=''&&this.rulegroup.writeWeight!=''
-                    &&this.rulegroup.certificateLength!=''&&this.rulegroup.compute!=''&&this.rulegroup.extremum!=''&&this.rulegroup.decimal!=''){
+                    &&this.rulegroup.certificateLength!=''&&this.rulegroup.compute!=''&&this.rulegroup.extremum!=''&&this.rulegroup.decimal!=''&&this.rulegroup.num!=''){
                          this.rulegroup.rules.push({
                              examinerNumber: this.rulegroup.examinerNumber,
                              interviewWeight: this.rulegroup.interviewWeight,
@@ -250,9 +250,10 @@
                     this.b=0;
                     this.c = 1;
                     this.$modify.setjudgeSystem(1);
+                    this.$modify.setjudgeRoom(1);
                     this.$alert('设置成功', '操作提示');
                 }else {
-                    alert("请先填写表格")
+                    this.$alert("请先填写表格")
                 }
             },
             updata(){
@@ -389,6 +390,7 @@
                         border: 1px solid #cccccc;
                     }
                     .add{
+
                         width: 101px;
                         height: 40px;
                         padding: 7.5px 26.5px;
@@ -440,6 +442,7 @@
 
         .final-set{
             position: absolute;
+            cursor: pointer;
             text-align: center;
             padding-top: 11.5px;
             padding-bottom: 11.5px;
