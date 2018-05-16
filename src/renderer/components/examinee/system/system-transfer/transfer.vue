@@ -19,7 +19,7 @@
                 <span style="font-size: 20px;color: red">数据导出时程序界面可能会失去响应，请耐心等待不要强行关闭程序</span>
             </div>
         </div>
-        <div class="modify-box">
+        <div class="modify-box" v-if="false">
             <div class="modify" >
                 <p>上报文件密码：<input v-model="codeKey" type="password" @keyup.13="NextInput()"/></p>
                 <p style="margin-left: 40px">再次确认：<input v-model="copyKey" ref="1" type="password" @keyup.13="KeyconfirmKey"/></p>
