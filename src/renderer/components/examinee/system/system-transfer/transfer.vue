@@ -79,10 +79,6 @@
             this.getSystem();
             this.getExportData();
             this.a=1;
-            this.$reportExaminer.remove({},{multi:true},function (err,ExaminerRemove) {
-            });
-            this.$reportAcievement.remove({},{multi:true},function (err,ExaminerRemove) {
-            });
         },
         methods:{
             NextInput(){
@@ -477,10 +473,6 @@
                             const title = this.encryptoSaveName;
                             const data1 = this.formatJson(filterVal1, list1);
                             encrypto_export_json_to_excel(tHeader1, data1, sheetName1,title,1 );
-                        });
-                        this.$achievement.remove({},{multi:true},function (err,ExaminerRemove) {
-                        });
-                        this.$examinerScore.remove({},{multi:true},function (err,ExaminerRemove) {
                         });
                         this.$modify.setjudgement(1);
                     }else {
