@@ -249,7 +249,7 @@
                     this.a=0;
                     this.b=0;
                     this.c = 1;
-                    this.$modify.setjudgeSystem(1);
+                    this.$modify.setjudgement(1);
                     this.$modify.setjudgeRoom(1);
                     this.$alert('设置成功', '操作提示');
                 }else {

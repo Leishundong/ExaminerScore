@@ -315,14 +315,6 @@
                     this.tableData.SummariseMin='';
                     this.tableData.point = [];
                 }
-                if(this.$modify.judgeSystem==1){
-                    this.tableData.point = [];
-                    this.tableData.SummariseMax='';
-                    this.tableData.SummariseMin='';
-                    this.Show.isshow = false;
-                    this.Information.achievement = '';
-                    this.$modify.setjudgeSystem(0);
-                }
             },
             BlurInput(el){
                 let ref=el.currentTarget;
