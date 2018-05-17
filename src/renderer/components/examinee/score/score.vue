@@ -33,31 +33,31 @@
                 <!--thead-->
                 <tr :style="">
                     <th>考官序号</th>
-                    <th v-for="factors in tableData.factor">{{factors.scoring}}({{tableData.num = true ? factors.toplimit:Number(factors.toplimit)/(parseInt(factors.weight)/100)}})</th>
+                    <th v-for="factors in tableDates.factor">{{factors.scoring}}({{tableDates.num = true ? factors.toplimit:Number(factors.toplimit)/(parseInt(factors.weight)/100)}})</th>
                     <th v-if="compute">总分</th>
                 </tr>
                 <!-- //计分//-->
 
-                <tr v-for="(number,row) in tableData.scores" :style="{backgroundColor:(row%2? '#d8ecf6' : '#fbf7e2')}" >
+                <tr v-for="(number,row) in tableDates.scores" :style="{backgroundColor:(row%2? '#d8ecf6' : '#fbf7e2')}" >
                     <td>{{number.Number}}</td>
-                    <td v-for="(factors,index) in tableData.factor">
-                        <input v-model="tableData.point[row][index]" @focus="inputFocus" :ref="factors.scoring" :data-row="row"  :data-index="index"  @blur="BlurInput"   @keyup.13="nextInput"/>
+                    <td v-for="(factors,index) in tableDates.factor">
+                        <input v-model="tableDates.point[row][index]" @focus="inputFocus" :ref="factors.scoring" :data-row="row"  :data-index="index"  @blur="BlurInput"   @keyup.13="nextInput"/>
                     </td>
-                    <td v-text="num(tableData.point[row],row)" v-if="compute"></td>
+                    <td v-text="num(tableDates.point[row],row)" v-if="compute"></td>
                 </tr>
-                <tr :style="{backgroundColor:((tableData.scores.length)%2? '#d8ecf6' : '#fbf7e2') }" v-if="extremums">
+                <tr :style="{backgroundColor:((tableDates.scores.length)%2? '#d8ecf6' : '#fbf7e2') }" v-if="extremums">
                     <td>最高分</td>
-                    <td v-for="(th,index) in tableData.factor" v-text="maxs(index)">mx[index]</td>
-                    <td v-text="tableData.SummariseMax" v-if="compute"></td>
+                    <td v-for="(th,index) in tableDates.factor" v-text="maxs(index)">mx[index]</td>
+                    <td v-text="tableDates.SummariseMax" v-if="compute"></td>
                 </tr>
-                <tr :style="{backgroundColor:((tableData.scores.length+1)%2? '#d8ecf6' : '#fbf7e2') }" v-if="extremums">
+                <tr :style="{backgroundColor:((tableDates.scores.length+1)%2? '#d8ecf6' : '#fbf7e2') }" v-if="extremums">
                     <td>最低分</td>
-                    <td v-for="(th,index) in tableData.factor" v-text="mins(index)"></td>
-                    <td v-text="tableData.SummariseMin" v-if="compute"></td>
+                    <td v-for="(th,index) in tableDates.factor" v-text="mins(index)"></td>
+                    <td v-text="tableDates.SummariseMin" v-if="compute"></td>
                 </tr>
-                <tr :style="{backgroundColor:((tableData.scores.length+2)%2? '#d8ecf6' : '#fbf7e2') }" v-if="!compute">
+                <tr :style="{backgroundColor:((tableDates.scores.length+2)%2? '#d8ecf6' : '#fbf7e2') }" v-if="!compute">
                     <td>平均分</td>
-                    <td v-for="(th,index) in tableData.factor" v-text="average(index)"></td>
+                    <td v-for="(th,index) in tableDates.factor" v-text="average(index)"></td>
                     <td v-if="compute"></td>
                 </tr>
             </table>
@@ -85,10 +85,12 @@
                         <span class="head-text">面试成绩</span>
                     </div>
                     <div class="achievement-text">
-                        <span>{{Information.achievement}}</span>
+                        <div class="text-box">
+                            <span class="text">{{Information.achievement}}</span>
+                        </div>
                     </div>
                     <div class="save-button">
-                        <span @click="save" style="cursor:pointer;">保存</span>
+                        <el-button class="button" @click="saves"  :disabled="valiDateTable">保存</el-button>
                     </div>
                 </div>
             </div>
@@ -115,7 +117,7 @@
                     totalScore:[],//存放各个考官的平均分
                     factorScore:[]//存放各个要素平均分
                 },
-                tableData:{
+                tableDates:{
                     factor:[],//存放各个要素的信息，决定列数
                     scores:[],//存放各个考官的信息，决定行数
                     point:[],//存放考官对各个要素的打分
@@ -203,11 +205,11 @@
                                 }
                             }; //排序用
                             factordocs.sort(compare("scoring"));
-                            this.tableData.factor = factordocs; //绑定要素信息
+                            this.tableDates.factor = factordocs; //绑定要素信息
                             this.$examinerdb.find({}).exec((err,examinerdocs)=>{
                                 console.log(examinerdocs);
                                 if(examinerdocs != ''){
-                                    this.tableData.scores=[];
+                                    this.tableDates.scores=[];
                                     //根据序号排序考官
                                     var compare = (prop)=>{
                                         return (obj1,obj2)=>{
@@ -224,14 +226,14 @@
                                     examinerdocs.sort(compare("Number"));
                                     //获取考官
                                         for (var i=0;i<examinerdocs.length-2;i++){
-                                            this.tableData.scores[i] = examinerdocs[i];
-                                            this.tableData.point.push({
+                                            this.tableDates.scores[i] = examinerdocs[i];
+                                            this.tableDates.point.push({
                                                 place:[],
                                             })
                                         };
                                         //获取核分员和记分员
-                                        this.tableData.Scorer[0] = examinerdocs[examinerdocs.length-2];
-                                        this.tableData.Scorer[1] = examinerdocs[examinerdocs.length-1];
+                                        this.tableDates.Scorer[0] = examinerdocs[examinerdocs.length-2];
+                                        this.tableDates.Scorer[1] = examinerdocs[examinerdocs.length-1];
 
 
                                     this.$ruledb.find({}).exec((err,ruledocs)=>{
@@ -266,7 +268,7 @@
                                     this.$addre.find({}).exec((err,Addredocs)=>{
                                         if(Addredocs!=''){
                                             console.log(Addredocs);
-                                            this.tableData.Address = Addredocs[0].adress;
+                                            this.tableDates.Address = Addredocs[0].adress;
                                             this.SaveData.adressId = Addredocs[0].adressId;
                                         }else {
                                             return
@@ -299,37 +301,52 @@
                 } else {
                     return false
                 }
+            },
+            valiDateTable(){
+                let vali = false;
+                if(this.Information.achievement == ''){
+                    vali = true
+                }
+                this.tableDates.scores.forEach((item,row)=>{
+                    this.tableDates.factor.forEach((item,index)=>{
+                        if(this.tableDates.point[row][index]==''){
+                            vali = true
+                        }
+                    })
+                });
+                return vali;
             }
         },
         methods:{
             inputFocus(el){
                 el.currentTarget.select();
+                this.Information.achievement = '';
             },
             judgements(){
                 if(this.$modify.judgement==1){
                     this.toNewGroup();
                     this.Show.isshow = false;
                     this.$modify.setjudgement(0);
-                    this.tableData.SummariseMax='';
+                    this.tableDates.SummariseMax='';
                     this.Information.achievement = '';
-                    this.tableData.SummariseMin='';
-                    this.tableData.point = [];
+                    this.tableDates.SummariseMin='';
+                    this.tableDates.point = [];
                 }
             },
             BlurInput(el){
                 let ref=el.currentTarget;
                 if(ref.value !=''){
                     if(this.Rulegroup.decimal==true){
-                        if(Number(ref.value)>parseInt(this.tableData.factor[ref.dataset.index].toplimit)||(ref.value.indexOf('.') == -1|| ref.value.substring(ref.value.indexOf("."),ref.value.length).length>2)){
-                            this.tableData.point[ref.dataset.row][ref.dataset.index]='';
+                        if(Number(ref.value)>parseInt(this.tableDates.factor[ref.dataset.index].toplimit)||(ref.value.indexOf('.') == -1|| ref.value.substring(ref.value.indexOf("."),ref.value.length).length>2)){
+                            this.tableDates.point[ref.dataset.row][ref.dataset.index]='';
                             if(this.$confirm("未对小数位后一位进行打分！或超出分数上限")){
                                 ref.value = '';
                             }else {}
                             return
                         }
                     }else {
-                        if(Number(ref.value)>parseInt(this.tableData.factor[ref.dataset.index].toplimit)){
-                            this.tableData.point[ref.dataset.row][ref.dataset.index]='';
+                        if(Number(ref.value)>parseInt(this.tableDates.factor[ref.dataset.index].toplimit)){
+                            this.tableDates.point[ref.dataset.row][ref.dataset.index]='';
                             if(this.$confirm("超出分数上限")){
                                 ref.value = '';
                             }else {}
@@ -342,53 +359,53 @@
                 let ref=el.currentTarget;
                 let index = Number(ref.dataset.index);
                 let row = Number(ref.dataset.row);
-                if(index<this.tableData.factor.length||row<this.tableData.point.length){
+                if(index<this.tableDates.factor.length||row<this.tableDates.point.length){
                     if(ref.value !=''){
                         if(this.Rulegroup.decimal==true){
-                            if(Number(ref.value)>parseInt(this.tableData.factor[index].toplimit)||(ref.value.indexOf('.') == -1|| ref.value.substring(ref.value.indexOf("."),ref.value.length).length>2)){
+                            if(Number(ref.value)>parseInt(this.tableDates.factor[index].toplimit)||(ref.value.indexOf('.') == -1|| ref.value.substring(ref.value.indexOf("."),ref.value.length).length>2)){
                                 if(this.$confirm("请对也仅对小数位后一位进行打分！或超出分数上限")){
                                     ref.value = '';
                                 }else {}
                                 return
                             }else{
-                                if((index+1)%this.tableData.factor.length == 0){
+                                if((index+1)%this.tableDates.factor.length == 0){
                                     row=row+1;
                                     index=0;
-                                    this.$refs[this.tableData.factor[index].scoring][row].focus();
+                                    this.$refs[this.tableDates.factor[index].scoring][row].focus();
                                 }else {
                                     index=index+1;
-                                    this.$refs[this.tableData.factor[index].scoring][row].focus();
+                                    this.$refs[this.tableDates.factor[index].scoring][row].focus();
                                 }
                             }
                         }else {
-                            if(Number(ref.value)>parseInt(this.tableData.factor[index].toplimit)){
+                            if(Number(ref.value)>parseInt(this.tableDates.factor[index].toplimit)){
                                 if(this.$confirm("超出分数上限")){
                                     ref.value = '';
                                 }else {}
                                 return
                             }else {
-                                if((index+1)%this.tableData.factor.length == 0){
-                                    if(row == this.tableData.scores.length-1){
+                                if((index+1)%this.tableDates.factor.length == 0){
+                                    if(row == this.tableDates.scores.length-1){
                                     }else{
                                         row=row+1;
                                         index=0;
-                                        this.$refs[this.tableData.factor[index].scoring][row].focus();
+                                        this.$refs[this.tableDates.factor[index].scoring][row].focus();
                                     }
                                 }else {
                                     index=index+1;
-                                    this.$refs[this.tableData.factor[index].scoring][row].focus();
+                                    this.$refs[this.tableDates.factor[index].scoring][row].focus();
                                 }
                             }
                         }
                     }
                 }
-                /*if((this.tableData.a+1)%this.tableData.factor.length == 0 && this.tableData.a !=0){
-                    this.tableData.a = 0;
-                    this.tableData.b = this.tableData.b+1;
-                    this.$refs[this.tableData.a][this.tableData.b].focus();
+                /*if((this.tableDates.a+1)%this.tableDates.factor.length == 0 && this.tableDates.a !=0){
+                    this.tableDates.a = 0;
+                    this.tableDates.b = this.tableDates.b+1;
+                    this.$refs[this.tableDates.a][this.tableDates.b].focus();
                 }else {
-                    this.tableData.a = this.tableData.a+1;
-                    this.$refs[this.tableData.a][this.tableData.b].focus();
+                    this.tableDates.a = this.tableDates.a+1;
+                    this.$refs[this.tableDates.a][this.tableDates.b].focus();
                 }*/
             },
             //计算考生成绩
@@ -401,7 +418,7 @@
                 let num='';//初始化数据
                 let nums=0;//临时数据，求和用
                 let a = 0;//用来确定表格是否填写完整
-                this.tableData.factor.forEach((item,index)=>{
+                this.tableDates.factor.forEach((item,index)=>{
                     let weight=parseInt(item.weight)/100;//根据获取到的信息算权重
                     if(val[index]!=null){         //判断是否存在评分
                         if( this.Rulegroup.num==true){
@@ -411,16 +428,16 @@
                             nums+=Number(val[index])*weight;
                             a += 1;
                         }
-                        if(a==this.tableData.factor.length){    //判断是否进行计算
+                        if(a==this.tableDates.factor.length){    //判断是否进行计算
                             this.Summarises.totalScore[row] = Number(nums);
                             return nums;
                         }
                     }
                 });
-                if(a == this.tableData.factor.length &&this.tableData.factor[0]!=null){//判断是否显示
+                if(a == this.tableDates.factor.length &&this.tableDates.factor[0]!=null){//判断是否显示
                     num = nums.toFixed(4)
                 }
-                if(this.Summarises.totalScore.length == this.tableData.scores.length&&this.tableData.point[0]!=null){
+                if(this.Summarises.totalScore.length == this.tableDates.scores.length&&this.tableDates.point[0]!=null){
                     this.Show.isshow = true;
                     let max = 0;
                     let min = 10000;
@@ -431,7 +448,7 @@
                             }
                         }
                     };
-                    this.tableData.SummariseMax = Number(max).toFixed(4);
+                    this.tableDates.SummariseMax = Number(max).toFixed(4);
                     for(var i=0;i<this.Summarises.totalScore.length;i++){
                         if(this.Summarises.totalScore[i] != null){
                             if(this.Summarises.totalScore[i]<=min){
@@ -439,7 +456,7 @@
                             }
                         }
                     };
-                    this.tableData.SummariseMin = Number(min).toFixed(4);
+                    this.tableDates.SummariseMin = Number(min).toFixed(4);
                 }
                 /*console.log(num)*/
                 return num //返回要显示的值
@@ -449,16 +466,16 @@
                 let min= 0;//初始一个最小的数
                 let a=0;//作用同上
                 //比大小
-                for(var i=0;i<this.tableData.point.length;i++){
-                    if(this.tableData.point[i][index] != null){
+                for(var i=0;i<this.tableDates.point.length;i++){
+                    if(this.tableDates.point[i][index] != null){
                         a = a+1;
-                        if(Number(this.tableData.point[i][index])>min){
-                            min = Number(this.tableData.point[i][index]);
-                            this.tableData.mx[index] = min;
+                        if(Number(this.tableDates.point[i][index])>min){
+                            min = Number(this.tableDates.point[i][index]);
+                            this.tableDates.mx[index] = min;
                         }
                     }
                 };
-                if(a == this.tableData.scores.length&&a!=0){
+                if(a == this.tableDates.scores.length&&a!=0){
                     //同上
                     max = min
                 }
@@ -470,16 +487,16 @@
                 let max =10000 ;// 初始一个绝对大的值
                 let a = 0;//同上
                 //比大小
-                for(var i=0;i<this.tableData.point.length;i++){
-                    if(this.tableData.point[i][index] != null){
+                for(var i=0;i<this.tableDates.point.length;i++){
+                    if(this.tableDates.point[i][index] != null){
                         a = a+1;
-                        if(max>Number(this.tableData.point[i][index])){
-                            max = Number(this.tableData.point[i][index])
-                            this.tableData.mn[index] = max
+                        if(max>Number(this.tableDates.point[i][index])){
+                            max = Number(this.tableDates.point[i][index])
+                            this.tableDates.mn[index] = max
                         }
                     }
                 }
-                if(a == this.tableData.scores.length&&a!=0){ //同上
+                if(a == this.tableDates.scores.length&&a!=0){ //同上
                     min = max
                 }
                 return min
@@ -490,27 +507,27 @@
                 let avg = '';//用于返回的数
                 let a = 0;//同上，判断用
                 //通过循环获取同要素各个考官打分情况，并计算
-                for(var i=0;i<this.tableData.scores.length;i++){
-                    if(this.tableData.point[i][index] != null){ //确定考官已答打分
-                        num += Number(this.tableData.point[i][index]);
+                for(var i=0;i<this.tableDates.scores.length;i++){
+                    if(this.tableDates.point[i][index] != null){ //确定考官已答打分
+                        num += Number(this.tableDates.point[i][index]);
                         a = a+1;
-                        if(a == this.tableData.scores.length){   //判断是否将值传出
+                        if(a == this.tableDates.scores.length){   //判断是否将值传出
                             if(this.Rulegroup.extremum == true){//判断是否去掉最值
-                                num = num-Number(this.tableData.mx[index])-Number(this.tableData.mn[index]);
-                                nums = num/(this.tableData.scores.length-2);
+                                num = num-Number(this.tableDates.mx[index])-Number(this.tableDates.mn[index]);
+                                nums = num/(this.tableDates.scores.length-2);
                                 console.log(nums);
                                 this.Summarises.factorScore[index] = nums;
                             }else {
-                                nums = num/this.tableData.scores.length;
+                                nums = num/this.tableDates.scores.length;
                                 this.Summarises.factorScore[index] = nums;
                             }
                         }
                     }
                 }
-                if(a==this.tableData.scores.length&&this.tableData.scores[0]!=null){//判断是否显示
+                if(a==this.tableDates.scores.length&&this.tableDates.scores[0]!=null){//判断是否显示
                     avg = nums.toFixed(4);
                 }
-                if(this.Summarises.factorScore.length==this.tableData.factor.length){
+                if(this.Summarises.factorScore.length==this.tableDates.factor.length){
                     this.Show.isshow = true;
                 }
                 return avg
@@ -518,14 +535,14 @@
             totalpoint(){
                 let summarise = 0;
                 let num       = 0;
-                let length    = this.tableData.scores.length;
-                this.tableData.point.forEach((item,index)=>{  //循环table数据，获取有效打分行数
+                let length    = this.tableDates.scores.length;
+                this.tableDates.point.forEach((item,index)=>{  //循环table数据，获取有效打分行数
                     if(this.Summarises.totalScore[index]!=null){  //根据保存各考官总分的数组判断此考官总分是否存在
                         num += Number(this.Summarises.totalScore[index]); //累加
                     }
                 });
                 if(this.Rulegroup.extremum ==true){
-                    num = num-Number(this.tableData.SummariseMin)-Number(this.tableData.SummariseMax);
+                    num = num-Number(this.tableDates.SummariseMin)-Number(this.tableDates.SummariseMax);
                     length = length-2;
                 }
                 summarise = num/length; //求出平均分
@@ -533,7 +550,7 @@
             },
             factorSummarise(){
                 let summarise = 0;
-                this.tableData.factor.forEach((item,index)=>{  //根据要素来循环
+                this.tableDates.factor.forEach((item,index)=>{  //根据要素来循环
                     let weight=parseInt(item.weight)/100; //计算权重
                     if(this.Summarises.factorScore[index]!=null){  //判断是否计算
                         if(this.Rulegroup.num == true){//要素平均分相加
@@ -663,7 +680,7 @@
             saveExaminerScore(){
                 /*以下为保存各个考官评分数据*/
                 //获取考官人数
-                let examinerNumber = this.tableData.scores.length;
+                let examinerNumber = this.tableDates.scores.length;
                 let groupNumber = this.Groups.GroupNumber.length-1;
                 //循环打印每个考官所给分数
                 for(var i=0;i<examinerNumber;i++){
@@ -672,22 +689,22 @@
                     examobj[i]={
                         '准考证号':this.Information.RegisterNumber,
                         '姓名':this.Information.Name,
-                        '面试室':this.tableData.Address,
-                        '考官姓名':this.tableData.scores[i].Name,
-                        '考官序号':this.tableData.scores[i].Number,
-                        '记分员':this.tableData.Scorer[0].scorerName,
-                        '核分员':this.tableData.Scorer[1].checkName,
+                        '面试室':this.tableDates.Address,
+                        '考官姓名':this.tableDates.scores[i].Name,
+                        '考官序号':this.tableDates.scores[i].Number,
+                        '记分员':this.tableDates.Scorer[0].scorerName,
+                        '核分员':this.tableDates.Scorer[1].checkName,
                         '面试组别':this.DialogGroup.group,
                         GroupNumber:this.Groups.GroupNumber[this.Groups.GroupNumber.length-1],
                         Number:this.Groups.Group[groupNumber].number[this.Groups.Group[groupNumber].number.length-1]
                     };
                     //在根据要素数获取每行各列成绩
-                    this.tableData.factor.forEach((item,index) => {
+                    this.tableDates.factor.forEach((item,index) => {
                         examobj[i][item.scoring]={
-                            Score:this.tableData.point[i][index]
+                            Score:this.tableDates.point[i][index]
                         };
-                        //还原tableData数据
-                        this.tableData.point[i][index] = null;
+                        //还原tableDates数据
+                        this.tableDates.point[i][index] = null;
                     });
                     //将这行数据存入临时数组
                     this.SaveData.Temporary.push(examobj);
@@ -704,9 +721,9 @@
                 };
                 //是数组扁平化
                 for(var i=0;i<examinerNumber;i++){
-                    for(var j=0;j<this.tableData.factor.length;j++){
-                        if(this.SaveData.ExaminerScore[i][this.tableData.factor[j].scoring] != null){
-                            this.SaveData.ExaminerScore[i][this.tableData.factor[j].scoring] = this.SaveData.ExaminerScore[i][this.tableData.factor[j].scoring].Score;
+                    for(var j=0;j<this.tableDates.factor.length;j++){
+                        if(this.SaveData.ExaminerScore[i][this.tableDates.factor[j].scoring] != null){
+                            this.SaveData.ExaminerScore[i][this.tableDates.factor[j].scoring] = this.SaveData.ExaminerScore[i][this.tableDates.factor[j].scoring].Score;
                         }
                     }
                 };
@@ -727,7 +744,7 @@
                 this.SaveData.Achievement['总成绩'] = this.SaveData.Summarise;
                 this.SaveData.Achievement['保存时间'] = this.SaveData.time;
                 this.SaveData.Achievement['面试序号'] = this.Groups.Group[groupNumber].number[this.Groups.Group[groupNumber].number.length-1];
-                this.SaveData.Achievement['面试室'] = this.tableData.Address;
+                this.SaveData.Achievement['面试室'] = this.tableDates.Address;
                 this.SaveData.Achievement['面试点'] = this.SaveData.adressId;
                 /*this.SaveData.Achievement.push({
                     '准考证号':this.Information.RegisterNumber,
@@ -761,7 +778,7 @@
                 this.DialogGroup.group = '';
                 this.SaveData.Summarise = '';
             },
-            save(){
+            saves(){
                 if(this.Information.achievement!=''){
                     this.$examinerScore.find({'准考证号':this.Information.RegisterNumber}).exec((err,docs)=>{
                         /*以下为保存各个考官评分数据*/
@@ -780,15 +797,15 @@
                             this.DialogGroup.examineeName = '';
                             this.DialogGroup.examineeIdCard = '';
                             this.Information.Numbers = '';
-                            this.tableData.SummariseMin='';
-                            this.tableData.SummariseMax='';
+                            this.tableDates.SummariseMin='';
+                            this.tableDates.SummariseMax='';
                             //显示Dialog
                             this.Show.dialogScore = true;
                             this.Show.showInformation=false;
                             this.Show.isshow = false;
                             this.Show.lastShow = true;
-                            this.tableData.a = 0;
-                            this.tableData.b = 0;
+                            this.tableDates.a = 0;
+                            this.tableDates.b = 0;
                             //调用排序方法
                             this.initializeGroup();
                         }else {
@@ -808,15 +825,15 @@
                                     this.DialogGroup.examineeName = '';
                                     this.DialogGroup.examineeIdCard = '';
                                     this.Information.Numbers = '';
-                                    this.tableData.SummariseMin='';
-                                    this.tableData.SummariseMax='';
+                                    this.tableDates.SummariseMin='';
+                                    this.tableDates.SummariseMax='';
                                     //显示Dialog
                                     this.Show.dialogScore = true;
                                     this.Show.showInformation=false;
                                     this.Show.isshow = false;
                                     this.Show.lastShow = true;
-                                    this.tableData.a = 0;
-                                    this.tableData.b = 0;
+                                    this.tableDates.a = 0;
+                                    this.tableDates.b = 0;
                                     //调用排序方法
                                     this.initializeGroup();
                                 })
@@ -1041,7 +1058,6 @@
                     font-family: adobe-regular;
                 }
                 .modify-number{
-
                     width: 94px;
                     margin-left: 28px;
                     padding:5.5px 30px;
@@ -1097,18 +1113,26 @@
                         }
                     }
                     .achievement-text{
-                        margin-top: 36px;
-                        text-align: center;
-                        font-size: 45px;
-                        color: #ff654f;
-                        font-family: adobe-regular;
+                        width: 100%;
+                        .text-box{
+                            width: 50%;
+                            margin-left: 25%;
+                           .text{
+                               position: absolute;
+                               text-align: center;
+                               margin-top: 36px;
+                               font-size: 45px;
+                               color: #ff654f;
+                               font-family: adobe-regular;
+                           }
+                        }
                     }
                     .save-button{
-                        position: absolute;
                         margin-top:40px;
                         margin-left: 180px;
-                        span{
+                        .button{
                             color: white;
+                            margin-top: 75px;
                             background: #ff654f;
                             border: #ff654f 1px solid;
                             width: 94px;
