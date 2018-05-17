@@ -32,9 +32,9 @@
                 <p>评分要素：<input ref="4" :value="factor[factorNumber]" disabled />
                     <span>要素权重：</span><input v-model="factorgroup.weight" @focus="inputFocus"  ref="5" @blur="BlurInputsd" @keyup.13="focusNextInputFive()"/>
                 </p>
-                <p>分数上限：<input v-model="factorgroup.toplimit" @focus="inputFocus" ref="6"  @keyup.13="add" /></p>
+                <p>分数上限：<input v-model="factorgroup.toplimit" @focus="inputFocus" ref="6"  @keyup.13="adds" /></p>
                 <div class="button-box">
-                    <span class="add" @click="add">添加</span>
+                    <span class="add" @click="adds">添加</span>
                     <span class="updata" @click="updata">清空</span>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                     <td v-for="(key,index) in factorgroup.factor"><input @focus="inputFocus" v-model="factorgroup.factor[index].weight"/></td>
                 </tr>
                 <tr style="background: #d8ecf6">
-                    <td class="column">分数上线</td>
+                    <td class="column">分数上限</td>
                     <td v-for="(key,index) in factorgroup.factor"><input @focus="inputFocus" v-model="factorgroup.factor[index].toplimit"/></td>
                 </tr>
                 <tr style="height:150px;width: 100%">
@@ -68,6 +68,8 @@
                 a:0,
                 b:0,
                 c:0,
+                enter:false,
+                d:0,
                 factorNumber:0,
                 factorgroup:{
                     factor:[],
@@ -86,6 +88,7 @@
                     decimal:'',
                     num:''
                 },
+                validates:0,
             }
         },
         watch:{
@@ -210,18 +213,51 @@
                 this.$refs[3].focus();
             },
             focusNextInputFive(){
-                this.$refs[6].focus();
+                if(this.d == 0){
+                    this.$refs[6].focus();
+                }else {
+                    this.d = 0;
+                }
             },
-            add(){
+            adds(ev){
+                if(ev.keyCode==13){
+                    if(this.enter == false){
+                        this.enter = true;
+                        this.tovaliDate();
+                        this.$refs[5].focus();
+                    }else {
+                        this.enter = true;
+                    }
+                }else {
+                    this.enter = false;
+                    this.tovaliDate();
+                    this.$refs[5].focus();
+                    this.d = 0;
+                }
+
+            },
+            tovaliDate(){
+                if(this.rulegroup.num!=''&&this.rulegroup.num == 'false'){
+                    this.validates = this.validates+(parseFloat(this.factorgroup.weight)/100);
+                }
+                if(this.validates <=1 &&this.factorgroup.toplimit!=''){
                     this.factorgroup.factor.push({
                         scoring: this.factor[this.factorNumber],
                         weight: this.factorgroup.weight,
                         toplimit: this.factorgroup.toplimit
                     });
-                        this.factorNumber =this.factorNumber+1,
-                        this.factorgroup.weight = '',
-                        this.factorgroup.toplimit = ''
-                        this.$refs[5].focus();
+                    this.factorNumber =this.factorNumber+1;
+                    this.factorgroup.weight = '';
+                    this.factorgroup.toplimit = '';
+                    this.$refs[5].focus();
+                    this.enter = false;
+                }else {
+                    this.$alert('权重之和大于1！');
+                    this.factorgroup.weight = '';
+                    this.factorgroup.toplimit = '';
+                    this.d = 1;
+                    this.enter = false;
+                }
             },
             completeSet(){
                 if(this.factorgroup.factor!=''&&this.rulegroup.examinerNumber!=''&&this.rulegroup.interviewWeight!=''&&this.rulegroup.writeWeight!=''
@@ -390,7 +426,6 @@
                         border: 1px solid #cccccc;
                     }
                     .add{
-
                         width: 101px;
                         height: 40px;
                         padding: 7.5px 26.5px;
