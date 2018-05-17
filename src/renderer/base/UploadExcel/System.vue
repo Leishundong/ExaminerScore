@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span @click="handleUpload">导入设置文件</span>
+    <span class="cur" @click="handleUpload">导入设置文件</span>
     <input id="excel-upload-input3" type="file" accept=".xlsx, .xls" class="c-hide" @change="handkeFileChange">
   </div>
 </template>

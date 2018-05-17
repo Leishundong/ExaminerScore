@@ -62,11 +62,15 @@
                 </router-link>
                 <router-link tag="div" class="bar" to="/examinee/system/remove">
                     <i class="iconfont icon-data" style="color: #cccccc"></i>
-                    <span>清空面试数据</span>
+                    <span>清空所有数据</span>
                 </router-link>
                 <router-link tag="div" class="bar" to="/examinee/system/modify">
                     <i class="iconfont icon-xiugai_f three-icon"></i>
                     <span>标语修改</span>
+                </router-link>
+                <router-link  tag="div" class="bar" to="/examinee/system/password">
+                    <i class="iconfont icon-set four-icon"></i>
+                    <span>修改密码</span>
                 </router-link>
             </div>
         </div>

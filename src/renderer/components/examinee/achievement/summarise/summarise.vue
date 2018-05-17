@@ -1,8 +1,8 @@
 <template>
     <div class="interview-achievement">
         <div class="head-box">
-            <input type="text" v-model="SearchKey" @keyup.13="search"/>
-            <span class="interview-button" @click="search">搜索</span>
+            <input type="text" v-model="SearchKey" @focus="inputFocus" @keyup.13="Keysearch"/>
+            <span class="interview-button"  @click="search">搜索</span>
             <span>可以按照准考证号查找</span>
         </div>
         <div class="table-box">
@@ -44,6 +44,7 @@
                title:{
                    factor:[],
                },
+               enter:false,
                SearchKey:'',
                ExaminerScore:[],
                SearchScore:[],
@@ -69,6 +70,9 @@
                  this.title.factor = docs;
              })
          },
+           inputFocus(el){
+               el.currentTarget.select();
+           },
            getExaminerScoring(){
                this.$examinerScore.find({}).sort({'GroupNumber':1,'Number':2,'考官序号':3}).exec((err,docs)=>{
                    this.ExaminerScore = docs;
@@ -78,18 +82,37 @@
                });
            },
            search(){
-               this.$examinerScore.find({'准考证号':this.SearchKey}).sort({'考官序号':1}).exec((err,docs)=>{
-                   if(docs != null&&docs != ''){
-                       this.ExaminerScore = [];
-                       this.ExaminerScore = docs;
-                       this.allindex = docs.length;
-                       this.allpage = Math.ceil(docs.length/7);
-                       this.pages(this.ExaminerScore);
-                   }else {
-                       this.$alert('查无此人')
-                   };
-                   this.SearchKey='';
-               })
+                   this.$examinerScore.find({'准考证号':this.SearchKey}).sort({'考官序号':1}).exec((err,docs)=>{
+                       if(docs != null&&docs != ''){
+                           this.ExaminerScore = [];
+                           this.ExaminerScore = docs;
+                           this.allindex = docs.length;
+                           this.allpage = Math.ceil(docs.length/7);
+                           this.pages(this.ExaminerScore);
+                       }else {
+                           this.$alert('请输入正确的关键字或数据为空！');
+                           this.SearchKey='';
+                       };
+                   })
+           },
+           Keysearch(){
+               if(this.enter==false){
+                   this.$examinerScore.find({'准考证号':this.SearchKey}).sort({'考官序号':1}).exec((err,docs)=>{
+                       if(docs != null&&docs != ''){
+                           this.ExaminerScore = [];
+                           this.ExaminerScore = docs;
+                           this.allindex = docs.length;
+                           this.allpage = Math.ceil(docs.length/7);
+                           this.pages(this.ExaminerScore);
+                       }else {
+                           this.$alert('请输入正确的关键字或数据为空！');
+                           this.SearchKey='';
+                           this.enter = true;
+                       };
+                   })
+               }else{
+                   this.enter = false;
+               }
            },
            pages(arr){
                this.ScorePage = [];
@@ -162,6 +185,7 @@
                 color:rgb(36,36,36);
             }
             .interview-button{
+                cursor:pointer;
                 font-size: 17px;
                 text-align: center;
                 display: inline-block;
@@ -225,6 +249,7 @@
             .foot-button-group{
                 margin-left: 25px;
                 .foot-button{
+                    cursor:pointer;
                     font-size: 17px;
                     text-align: center;
                     display: inline-block;

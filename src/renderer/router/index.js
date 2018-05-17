@@ -20,7 +20,8 @@ const routers = [
                     {path:'scoreset',name:'scoreset',component:_import('examinee/system/system-scoreset/scoreset')},
                     {path:'transfer',name:'transfer',component:_import('examinee/system/system-transfer/transfer')},
                     {path:'remove',component:_import('examinee/system/system-remove/remove')},
-                    {path:'modify',name:'modify',component:_import('examinee/system/system-modify/modify')}
+                    {path:'modify',name:'modify',component:_import('examinee/system/system-modify/modify')},
+                    {path:'password',name:'password',component:_import('examinee/system/system-password/password')}
                 ]}
         ]}
 ];

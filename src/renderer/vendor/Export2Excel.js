@@ -3,13 +3,7 @@ require('script-loader!file-saver');
 require('script-loader!vendor/Blob');
 require('script-loader!xlsx/dist/xlsx.core.min');
 var JSZip = require('jszip');
-var crypto = require('crypto'),
-    algorithm = 'aes-256-ctr',
-    password = 'd6F3Efeq';
-
-
-
-
+var modify = require('../config');
 function generateArray(table) {
     var out = [];
     var rows = table.querySelectorAll('tr');
@@ -91,26 +85,6 @@ function Workbook() {
     this.SheetNames = [];
     this.Sheets = {};
 }
-
-function s2ab(s) {
-    var buf = new ArrayBuffer(s.length);
-    var view = new Uint8Array(buf);
-    for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
-    return buf;
-}
-
-function ab2s(ab){
-    var buf = new Buffer(ab.byteLength);
-    var view = new Uint8Array(ab);
-    for (var i = 0; i < buf.length; ++i) buf[i] = view[i];
-    return buf;
-}
-
-function encrypt(arraybuffer){
-    var cipher = crypto.createCipher(algorithm,password)
-    var crypted = Buffer.concat([cipher.update(ab2s(arraybuffer)),cipher.final()]);
-    return crypted;
-}
 export function export_table_to_excel(id) {
     var theTable = document.getElementById(id);
     console.log('a')
@@ -158,7 +132,7 @@ export function export_json_to_excel(th, jsonData, sheetsName, defaultTitle,a) {
         wb = new Workbook();
        /* encrypt(Buffer.from(s2ab(wbout)))*/
         var title = defaultTitle ;
-        saveAs(new Blob([s2ab(wbout)], {type: "application/octet-stream"}),title+".xlsx")
+        saveAs(new Blob([modify.default.s2ab(wbout)], {type: "application/octet-stream"}),title+".xlsx")
       /*
         var zip = new JSZip();
         zip.file(title+".xlsx", new Blob([s2ab(wbout)], {type: "application/octet-stream"}),{binary:true});
@@ -191,7 +165,9 @@ export function encrypto_export_json_to_excel(th, jsonData, sheetsName, defaultT
         wb = new Workbook();
         /* encrypt(Buffer.from(s2ab(wbout)))*/
         var title = defaultTitle ;
-        saveAs(new Blob([encrypt(s2ab(wbout))], {type: "application/octet-stream"}),title+".sec")
+        let bufs = modify.default.s2ab(wbout);
+        let buf = modify.default.ab2s(bufs);
+        saveAs(new Blob([modify.default.encrypt(buf)], {type: "application/octet-stream"}),title+".sec")
         /*
           var zip = new JSZip();
           zip.file(title+".xlsx", new Blob([s2ab(wbout)], {type: "application/octet-stream"}),{binary:true});
@@ -224,7 +200,7 @@ export function exportSystem_json_to_excel(th, jsonData, sheetsName, defaultTitl
         wb = new Workbook();
         /* encrypt(Buffer.from(s2ab(wbout)))*/
         var title = defaultTitle ;
-        saveAs(new Blob([s2ab(wbout)], {type: "application/octet-stream"}),title+".xlsx")
+        saveAs(new Blob([modify.default.s2ab(wbout)], {type: "application/octet-stream"}),title+".xlsx")
         /*
           var zip = new JSZip();
           zip.file(title+".xlsx", new Blob([s2ab(wbout)], {type: "application/octet-stream"}),{binary:true});
@@ -257,7 +233,7 @@ export function report_export_json_to_excel(th, jsonData, sheetsName, defaultTit
         /* encrypt(Buffer.from(s2ab(wbout)))*/
         var title = defaultTitle ;
         var zip = new JSZip();
-        zip.file(title+".xlsx", new Blob([s2ab(wbout)], {type: "application/octet-stream"}),{binary:true});
+        zip.file(title+".xlsx", new Blob([modify.default.s2ab(wbout)], {type: "application/octet-stream"}),{binary:true});
         zip.generateAsync({type:"blob"})
             .then(function(content) {
                 // see FileSaver.js

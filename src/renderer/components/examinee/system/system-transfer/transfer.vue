@@ -1,7 +1,7 @@
 <template>
     <div class="transfer">
         <div class="instance-box" >
-            <div class="instance" style="margin: auto">
+            <div class="instance">
                 <upload-excel  @on-selected-file='selected'></upload-excel>
                 <upload-excels  @on-selected-file='importRoom'></upload-excels>
                 <span class="span-button" style="background: rgb(167,217,77);margin-left: 25px" @click="exports">导出数据到xls</span>
@@ -19,12 +19,13 @@
                 <span style="font-size: 20px;color: red">数据导出时程序界面可能会失去响应，请耐心等待不要强行关闭程序</span>
             </div>
         </div>
-        <div class="modify-box">
+        <div class="modify-box" v-if="false">
             <div class="modify" >
-                <p>上报文件密码：<input v-model="codeKey" type="password"/></p>
-                <p style="margin-left: 40px">再次确认：<input v-model="copyKey" type="password"/></p>
+                <p>上报文件密码：<input v-model="codeKey" type="password" @keyup.13="NextInput()"/></p>
+                <p style="margin-left: 40px">再次确认：<input v-model="copyKey" ref="1" type="password" @keyup.13="KeyconfirmKey"/></p>
                 <p style="font-size: 18px;color: #ff2e2a;position: absolute;margin-left: 480px;margin-top: 15px" v-if="!(codeKey==copyKey)">两次输入的密码不一致</p>
-                <span @click="modifyKey" style="width: 110px">确认</span><span style="margin-left: 80px;width: 120px" @click="resetKey">重置密码</span>
+                <el-button type="primary" class="button" style="width: 110px" @click="confirmKey" :disabled="isadd">确定</el-button>
+                <span style="margin-left: 80px;width: 120px" @click="resetKey">默认密码</span>
             </div>
         </div>
     </div>
@@ -45,7 +46,7 @@
         },
         data(){
             return{
-                a:1,
+                enter:false,
                 Achievement:[],
                 ExaminerScore:[],
                 SummarisesScore:[],
@@ -64,6 +65,13 @@
             }
         },
         computed:{
+            isadd(){
+                if(this.codeKey!=''&&this.copyKey!=''&&this.codeKey==this.copyKey){
+                    return false
+                }else {
+                    return true
+                }
+            }
         },
         activated(){
         },
@@ -71,12 +79,51 @@
             this.getSystem();
             this.getExportData();
             this.a=1;
-            this.$reportExaminer.remove({},{multi:true},function (err,ExaminerRemove) {
-            });
-            this.$reportAcievement.remove({},{multi:true},function (err,ExaminerRemove) {
-            });
         },
         methods:{
+            NextInput(){
+                this.$refs[1].focus();
+            },
+            confirmKey(){
+                    if(this.codeKey!=''){
+                        this.$modify.setpassword(this.codeKey);
+                        if(this.codeKey == this.$modify.password){
+                            this.$alert('输入上报密码成功');
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }else {
+                            this.$alert('输入失败');
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }
+                    }else {
+                        this.$alert('请先输入上报文件密码');
+                    }
+            },
+            KeyconfirmKey(){
+                if(this.enter==false){
+                    if(this.codeKey!=''){
+                        this.$modify.setpassword(this.codeKey);
+                        if(this.codeKey == this.$modify.password){
+                            this.$alert('输入上报密码成功');
+                            this.enter = true;
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }else {
+                            this.$alert('输入失败');
+                            this.enter = true;
+                            this.codeKey = '';
+                            this.copyKey = '';
+                        }
+                    }else {
+                        this.$alert('请先输入上报文件密码');
+                        this.enter = true;
+                    }
+                }else {
+                    this.enter = false;
+                }
+
+            },
             getSystem(){
                 this.$ruledb.find().exec((err,docs)=>{
                     if(docs!=''){
@@ -119,15 +166,20 @@
                     };
                 };
                 if(results[0].hasOwnProperty("应用单位")==true){
-                    this.$System.remove({},{multi:true},function (err,ExaminerRemove) {
+                    let messages = [];
+                    messages.push({
+                        unit: results[0]['应用单位'],
+                        time: results[0]['应用时间']
                     });
-                    this.$System.insert(results,(err,docs)=> {
-                        this.$modify.setname(docs[0]['应用单位']);
-                        this.$modify.settime(docs[0]['应用时间']);
+                    this.$Messages.remove({},{multi:true},function (err,ExaminerRemove) {
+                    });
+                    this.$Messages.insert(messages,(err,docs)=> {
+                        this.$modify.setname(docs[0]['unit']);
+                        this.$modify.settime(docs[0]['time']);
                         this.$router.push({
                             path:this.$route.fullPath, // 获取当前连接，重新跳转
                             query:{
-                                _time:new Date().getTime()/1000  // 时间戳，刷新当前router
+                                _time:new Date().getTime()/100000  // 时间戳，刷新当前router
                             }
                         })
                     });
@@ -243,7 +295,7 @@
                     });
                     results = {};
                 }else {
-                    this.$alert('导入格式不正确');
+                    this.$alert('导入格式不正确或密码不正确');
                 }
                 /*this.$reportAcievement.find().exec((err,docs)=>{
                     console.log(docs);
@@ -392,96 +444,60 @@
                 }
             },
             encryptoExport(){
-                if(this.ExaminerScore!=''&&this.SummarisesScore!=''&&this.titles!=''&&this.encryptoSaveName!=''&&this.a==1){
-                    require.ensure([], () => {
-                        let NewSummarisesScore = [];
-                        for (var i=0;i<this.SummarisesScore.length;i++){
-                            var flag = true;
-                            for(var j=0;j<NewSummarisesScore.length;j++){
-                                if(this.SummarisesScore[i]['准考证号'] == NewSummarisesScore[j]['准考证号']){
-                                    flag = false;
+                if(this.$modify.password!=''){
+                    if(this.ExaminerScore!=''&&this.SummarisesScore!=''&&this.titles!=''&&this.encryptoSaveName!=''){
+                        require.ensure([], () => {
+                            let NewSummarisesScore = [];
+                            for (var i=0;i<this.SummarisesScore.length;i++){
+                                var flag = true;
+                                for(var j=0;j<NewSummarisesScore.length;j++){
+                                    if(this.SummarisesScore[i]['准考证号'] == NewSummarisesScore[j]['准考证号']){
+                                        flag = false;
+                                    };
                                 };
-                            };
-                            if(flag){
-                                NewSummarisesScore.push(this.SummarisesScore[i]);
-                            };
-                        }
-                        const { encrypto_export_json_to_excel } = require('@/vendor/Export2Excel');
-                        const tHeader = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
-                        const filterVal = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
-                        const list = NewSummarisesScore;
-                        const sheetName = '面试成绩';
-                        const data = this.formatJson(filterVal, list);
-                        encrypto_export_json_to_excel(tHeader, data, sheetName);
-                        const tHeader1 = this.titles;
-                        const filterVal1 = this.titles;
-                        const list1 = this.ExaminerScore;
-                        const sheetName1 = '考官评分';
-                        const title = this.encryptoSaveName;
-                        const data1 = this.formatJson(filterVal1, list1);
-                        encrypto_export_json_to_excel(tHeader1, data1, sheetName1,title,1 );
-                    });
-                    this.$achievement.remove({},{multi:true},function (err,ExaminerRemove) {
-                    });
-                    this.$examinerScore.remove({},{multi:true},function (err,ExaminerRemove) {
-                    });
-                    this.$modify.setjudgement(1);
-                    this.a=0;
+                                if(flag){
+                                    NewSummarisesScore.push(this.SummarisesScore[i]);
+                                };
+                            }
+                            const { encrypto_export_json_to_excel } = require('@/vendor/Export2Excel');
+                            const tHeader = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
+                            const filterVal = ['准考证号', '姓名', '身份证号','笔试成绩','面试成绩','总成绩','总名次','报考单位','报考岗位','面试点','保存时间','面试组别','面试序号'];
+                            const list = NewSummarisesScore;
+                            const sheetName = '面试成绩';
+                            const data = this.formatJson(filterVal, list);
+                            encrypto_export_json_to_excel(tHeader, data, sheetName);
+                            const tHeader1 = this.titles;
+                            const filterVal1 = this.titles;
+                            const list1 = this.ExaminerScore;
+                            const sheetName1 = '考官评分';
+                            const title = this.encryptoSaveName;
+                            const data1 = this.formatJson(filterVal1, list1);
+                            encrypto_export_json_to_excel(tHeader1, data1, sheetName1,title,1 );
+                        });
+                        this.$modify.setjudgement(1);
+                    }else {
+                        if(this.$confirm("导出数据不完全！")){
+                        }else {}
+                    }
                 }else {
-                    if(this.$confirm("导出数据不完全！或重复导出上报文件")){
-                    }else {}
+                    this.$alert('请先设置加密密码。')
                 }
             },
             formatJson(filterVal, jsonData) {
                 return jsonData.map(v => filterVal.map(j => v[j]))
             },
-            modifyKey(){
-                this.$prompt('请先输入原密码', '修改密码', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputType:'password',
-                    beforeClose:(action, instance, done)=>{
-                        if(action==='confirm'){
-                            if(instance.inputValue == this.Key){
-                                this.Key = this.codeKey;
-                                this.$message.success('修改成功');
-                                done();
-                            }
-                            else{
-                                this.$message.error('请输正确密码');
-                                done();
-                            }
-                        }
-                        else{
-                            this.$message.info('取消输入，修改失败');
-                            done();
-                        }
-                    }
-                })
-            },
             resetKey(){
-                this.$prompt('请先输入原始密码', '重置密码', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputType:'password',
-                    beforeClose:(action, instance, done)=>{
-                        if(action==='confirm'){
-                            if(instance.inputValue == '123456'){
-                                this.Key = '123456';
-                                this.$message.success('重置成功，密码还原为原始密码');
-                                done();
-                            }
-                            else{
-                                this.$message.error('请输正确密码');
-                                done();
-                            }
+                this.$confirm('确定使用默认密码？')
+                    .then(_ => {
+                        this.$modify.setpassword("d6F3Efeq");
+                        if(this.$modify.password == 'd6F3Efeq'){
+                            this.$message.success('设置成功，密码设为默认密码'
+                            );}else {
+                            this.$message.error('设置失败，请自行设置密码')
                         }
-                        else{
-                            this.$message.info('取消输入，修改失败');
-                            done();
-                        }
-                    }
-                })
+                        done();
+                    })
+                    .catch(_ => {});
             },
         }
     }
@@ -499,6 +515,7 @@
         text-align: center;
         .span-button{
             float: left;
+            cursor:pointer;
             margin-left: 25px;
             margin-top: 10px;
             width: 170px;
@@ -510,10 +527,9 @@
             color: #fff;
         }
         .instance-box{
-            float: left;
-            width: 100%;
+            width: 90%;
+            margin-left: 9%;
             .instance{
-                margin: 0 auto;
             }
         }
         .modify-box{
@@ -533,7 +549,16 @@
                     border: #0086b3 1px solid;
                     border-radius: 5px;
                 }
+                .button{
+                    position: absolute;
+                    margin-top: 50px;
+                    margin-left: -180px;
+                    background: #0098FE;
+                    text-align: center;
+                    color: #fff;
+                }
                 span{
+                    cursor: pointer;
                     position: absolute;
                     margin-top: 50px;
                     margin-left: -180px;

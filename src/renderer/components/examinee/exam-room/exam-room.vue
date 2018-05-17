@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="exam-button" v-show="show.btn">
-            <button type="button" class="room-button" @click="Roomcity">请选择面试点与面试室</button>
+            <button type="button" class="room-button" @click="Roomcity" :disabled="show.showroom">请选择面试点与面试室</button>
         </div>
         <div v-if="!show.btn">
             <div class="City-group ys1" v-if="!show.Cshow">
@@ -10,7 +10,7 @@
                     <li :class="Roomgroup.list[index]?'select':'noSelect'" @click="selectGroup(index,item)"
                             v-for="(item,index) in Roomgroup.city" v-text="item"></li>
                 </ul>
-                <span class="city-button" @click="selectRoom">下一步</span>
+                <span type="button" class="city-button" @click="selectRoom">下一步</span>
             </div>
             <div class="Room-group ys2" v-if="!show.Rshow">
                 <h4 class="Room-title">选择当前面试室</h4>
@@ -19,6 +19,7 @@
                         <li :class="Roomgroup.list[index]?'select':'noSelect'" @click="selectGroup(index,item)"
                             v-for="(item,index) in Roomgroup.room" v-text="item"></li>
                     </ul>
+                    <span class="Backcity-button"  @click="onBackCityClick">返回</span>
                     <span class="Rbutton" @click="ConfirmRoom">确定</span>
                 </div>
             </div>
@@ -35,9 +36,10 @@
                     </div>
                     <div class="two" :style="left">
                         <span>核分员:</span>
-                        <input type="text" style="text-align: center" v-model="Roomgroup.examinerName[Roomgroup.examinertitle.length+1]" @focus="inputFocus" ref="check" />
+                        <input type="text" style="text-align: center" v-model="Roomgroup.examinerName[Roomgroup.examinertitle.length+1]" @focus="inputFocus" ref="check" @keyup.13="KeysetExaminer" />
                     </div>
                 </div>
+                <span class="Backcity-button"  @click="onBackRoomClick">返回</span>
                 <span class="Examiner-button" @click="setExaminer">确定</span>
             </div>
         </div>
@@ -56,6 +58,8 @@
                     Rshow:true,
                     Eshow:true,
                     Cshow:false,
+                    showroom:true,
+                    enter:false,
                 },
                 AddressGroup:{
                     roomNumber:[],
@@ -91,35 +95,33 @@
                 }
             }
         },
-        created(){
-            this.$System.find().exec((err,docs)=>{
-                if(docs!=''){
-                    this.$modify.setname(docs[0]['应用单位']);
-                    this.$modify.settime(docs[0]['应用时间']);
-                    this.$router.push({
-                        path:this.$route.fullPath, // 获取当前连接，重新跳转
-                        query:{
-                            _time:new Date().getTime()/1000  // 时间戳，刷新当前router
-                        }
-                    })
-                }else{
-                    return ;
-                }
-            })
-        },
         activated(){
-            this.show.btn = true;
-            this.show.Rshow = true;
-            this.show.Eshow = true;
-            this.show.Cshow = false;
-            this.AddressGroup.roomNumber=[];
-            this.Roomgroup.examinertitle=[];
             this.determineRoom();
-            this.getExaminer();
+            if(this.$modify.judgeRoom==1){
+                this.show.showroom=true;
+                this.show.btn = true;
+                this.show.Rshow = true;
+                this.show.Eshow = true;
+                this.show.Cshow = false;
+                this.Roomgroup.examinerName = [];
+                this.AddressGroup.roomNumber=[];
+                this.Roomgroup.examinertitle=[];
+                this.$modify.setjudgeRoom(0);
+            }
         } ,
         methods:{
             inputFocus(el){
                 el.currentTarget.select();
+            },
+            onBackCityClick(){
+                this.show.Cshow = false;
+                this.select.val = '';
+                this.Roomgroup.list = {};
+            },
+            onBackRoomClick(){
+                this.show.Rshow = false;
+                this.select.val = '';
+                this.Roomgroup.list = {};
             },
             nextInputs(el){
                 let ref=el.currentTarget;
@@ -133,9 +135,20 @@
                 }
             },
             determineRoom(){
-                   this.$dbRoom.find({}).sort({[RoomCode]:1}).exec((err,docs)=>{
+                this.$dbRoom.find({}).sort({[RoomCode]:1}).exec((err,docs)=>{
                        let determineRoom = docs;
                        if(determineRoom!=''){
+                           this.$ruledb.find({}).exec((err,docs)=>{
+                               if(docs!='' && docs != null){
+                                   this.show.showroom = false;
+                                   let ExaminerNumber = parseInt(docs[0].examinerNumber);
+                                   for(var i=1;i<=ExaminerNumber;i++){
+                                       this.Roomgroup.examinertitle[i-1] = '考官'+i;
+                                   }
+                               }else {
+                                   this.$alert('请先前往系统设置设置考官人数！');
+                               };
+                           })
                        }else {
                            this.$alert('请先前往系统设置导入考试室信息！');
                        }
@@ -179,58 +192,81 @@
                     return
                 }
             },
-            getExaminer(){
-                this.$ruledb.find({}).exec((err,docs)=>{
-                    if(docs!='' && docs != null){
-                        let ExaminerNumber = parseInt(docs[0].examinerNumber);
-                        for(var i=1;i<=ExaminerNumber;i++){
-                            this.Roomgroup.examinertitle[i-1] = '考官'+i;
+            setExaminer(){
+                    for(var i=0;i<this.Roomgroup.examinerName.length;i++){
+                        if(i==this.Roomgroup.examinerName.length-2){
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                scorerName: this.Roomgroup.examinerName[i]
+                            })
+                        }else if(i==this.Roomgroup.examinerName.length-1){
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                checkName: this.Roomgroup.examinerName[i]
+                            })
+                        }else {
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                Name: this.Roomgroup.examinerName[i]
+                            })
                         }
                     }
-                })
+                    this.$examinerdb.remove({}, {multi: true}, function (err, Examinerdocs) {
+                    });
+                    this.$examinerdb.insert(this.Roomgroup.examiner,(err,Examinerdocs)=> {
+                        this.Roomgroup.examiner = [];
+                        if(Examinerdocs != '' && Examinerdocs != null){
+                            this.$alert("考官设置成功");
+                        }
+                    })
             },
-            setExaminer(){
-               for(var i=0;i<this.Roomgroup.examinerName.length;i++){
-                   if(i==this.Roomgroup.examinerName.length-2){
-                       this.Roomgroup.examiner.push({
-                           Number: i+1,
-                           scorerName: this.Roomgroup.examinerName[i]
-                       })
-                   }else if(i==this.Roomgroup.examinerName.length-1){
-                       this.Roomgroup.examiner.push({
-                           Number: i+1,
-                           checkName: this.Roomgroup.examinerName[i]
-                       })
-                   }else {
-                       this.Roomgroup.examiner.push({
-                           Number: i+1,
-                           Name: this.Roomgroup.examinerName[i]
-                       })
-                   }
-               }
-                this.Roomgroup.examinerName = [];
-                this.$examinerdb.remove({}, {multi: true}, function (err, Examinerdocs) {
-                });
-                this.$examinerdb.insert(this.Roomgroup.examiner,(err,Examinerdocs)=> {
-                    this.Roomgroup.examiner = [];
-                    if(Examinerdocs != '' && Examinerdocs != null){
-                       this.$router.push({name:'score'})
-                   }
-               })
+            KeysetExaminer(){
+                if(this.show.enter ==false){
+                    for(var i=0;i<this.Roomgroup.examinerName.length;i++){
+                        if(i==this.Roomgroup.examinerName.length-2){
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                scorerName: this.Roomgroup.examinerName[i]
+                            })
+                        }else if(i==this.Roomgroup.examinerName.length-1){
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                checkName: this.Roomgroup.examinerName[i]
+                            })
+                        }else {
+                            this.Roomgroup.examiner.push({
+                                Number: i+1,
+                                Name: this.Roomgroup.examinerName[i]
+                            })
+                        }
+                    }
+                    this.$examinerdb.remove({}, {multi: true}, function (err, Examinerdocs) {
+                    });
+                    this.$examinerdb.insert(this.Roomgroup.examiner,(err,Examinerdocs)=> {
+                        this.Roomgroup.examiner = [];
+                        if(Examinerdocs != '' && Examinerdocs != null){
+                            this.$alert("考官设置成功");
+                            this.show.enter = true;
+                        }
+                    })
+                }else {
+                    this.show.enter = false;
+                }
             },
             ConfirmRoom(){
                if(this.select.val != ''){
+                   this.AddressGroup.roomNumber=[];
                    this.AddressGroup.roomNumber.push({
                        adress:this.select.val,
                        adressId:this.AddressGroup.roomId,
                    });
-                   this.$addre.remove({}, {multi: true}, function (err, docs) {
+                   this.$addre.remove({}, {multi: true},(err, docs)=> {
                    });
                    this.$addre.insert(this.AddressGroup.roomNumber,(err,docs)=>{
                    });
-                   this.AddressGroup.roomId='';
                    this.show.Eshow = false;
                    this.show.Rshow = true;
+                   this.show.enter = false;
                    this.select.val='';
                }else {
                    return
@@ -252,6 +288,7 @@
         margin: 50px auto;
         text-align: center;
         .room-button{
+            cursor:pointer;
             margin-top: 90px;
             color: #fff;
             font-size: 36px;
@@ -262,22 +299,36 @@
         }
     }
     .city-button{
+        cursor:pointer;
         position: absolute;
         margin-left: 572px;
         text-align: center;
         margin-top: 15px;
-        padding: 15px 10.5pt;
+        padding: 15px 25px;
+        font-size:20px;
+        border-radius: 10%;
+        border: #969896 solid 1px;
+        color: rgb(68,68,68);
+    }
+    .Backcity-button{
+        cursor:pointer;
+        position: absolute;
+        margin-left: 452px;
+        text-align: center;
+        margin-top: 15px;
+        padding: 15px 25px;
         font-size:20px;
         border-radius: 10%;
         border: #969896 solid 1px;
         color: rgb(68,68,68);
     }
     .Rbutton{
+        cursor:pointer;
         position: absolute;
         margin-left: 572px;
         text-align: center;
         margin-top: 15px;
-        padding: 15px 30px;
+        padding: 15px 25px;
         font-size:20px;
         border-radius: 10%;
         border: #969896 solid 1px;
@@ -322,10 +373,11 @@
             }
         }
         .Examiner-button{
+            cursor:pointer;
             position: absolute;
             margin-left: 572px;
             text-align: center;
-            padding: 15px 21px;
+            padding: 15px 25px;
             margin-top: 15px;
             font-size:20px;
             border-radius: 10%;

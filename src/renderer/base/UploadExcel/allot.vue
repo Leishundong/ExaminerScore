@@ -1,29 +1,14 @@
 <template>
     <div>
-        <span @click="handleUpload">导入上报文件</span>
-        <input id="excel-upload-input2" type="file" multiple="multiple" accept=".xlsx, .xls" class="c-hide" @change="handkeFileChange">
+        <span class="cur" @click="handleUpload">导入上报文件</span>
+        <input id="excel-upload-input2" type="file" multiple="multiple" accept=".sec" class="c-hide" @change="handkeFileChange">
     </div>
 </template>
 
 <script>
-    import XLSX from 'xlsx'
+    import XLSX from 'xlsx';
+    import modify from '../../config';
 
-
-    var crypto = require('crypto'),
-        algorithm = 'aes-256-ctr',
-        password = 'd6F3Efeq';
-
-    function ab2s(ab){
-        var buf = new Buffer(ab.byteLength);
-        var view = new Uint8Array(ab);
-        for (var i = 0; i < buf.length; ++i) buf[i] = view[i];
-        return buf;
-    }
-    function decrypt(arraybuffer){
-        var decipher = crypto.createDecipher(algorithm,password)
-        var dec = Buffer.concat([decipher.update(ab2s(arraybuffer)) , decipher.final()]);
-        return dec;
-    }
 
     export default {
         data() {
@@ -41,11 +26,15 @@
                 this.excelData.header=header ;
                 this.excelData.results=results;
                 this.loading = false;
-                console.log(this.excelData)
+                console.log(this.excelData);
                 this.$emit('on-selected-file', this.excelData)
             },
             handleUpload() {
-                document.getElementById('excel-upload-input2').click();
+                if(modify.password!=''){
+                    document.getElementById('excel-upload-input2').click();
+                }else {
+                    this.$alert('请先输入加密密码。')
+                }
             },
             handkeFileChange(e) {
                 var fileLength = 0;
@@ -54,15 +43,16 @@
                 var reader = new FileReader();
                 reader.readAsArrayBuffer(files[fileLength]);
                 reader.onabort = function(e) {
-                    console.log("文件读取异常" + files[fileLength].name);
+                    this.$alert("文件读取异常" + files[fileLength].name);
                 };
                 reader.onerror = function(e) {
-                    console.log("文件读取出现错误" + files[fileLength].name);
+                    this.$alert("文件读取出现错误" + files[fileLength].name);
                 };
                 reader.onload = e => {
                     if(e){
                         this.excelData.addressName = files[fileLength].name;
-                        let data = decrypt(e.target.result);
+                        let buf = modify.ab2s(e.target.result);
+                        let data = modify.decrypt(buf);
                         let fixedData = this.fixdata(data);
                         let workbook = XLSX.read(btoa(fixedData), { type: 'base64' });
                         for (var i=0;i<2;i++){
