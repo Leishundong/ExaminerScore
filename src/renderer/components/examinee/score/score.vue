@@ -647,20 +647,37 @@
             KeyfindExaminee() {
                 //根据考号查找
                 if (this.Show.enter == false) {
+                    //根据考号查找
                     this.$examineedb.find({[registerNumber]: this.DialogGroup.examineeRegisterNumber}).exec((err, docs) => {
                         if (docs != '') {
                             this.DialogGroup.examineeName = docs[0][examineeName];
                             this.DialogGroup.examineeIdCard = docs[0][examineeIdCard];
                             this.DialogGroup.group = docs[0][postGroup];
+                            console.log(docs);
                             this.SaveData.Achievement = docs[0];
                             //控制模态框中考生信息显示与否
                             if (this.DialogGroup.examineeName != '' && this.DialogGroup.examineeIdCard != '') {
                                 this.Show.showInformation = true;
                             }
+                            this.$examinerScore.find({[registerNumber]: this.DialogGroup.examineeRegisterNumber}).sort({"考官序号": 1}).exec((err, docs) => {
+                                if (docs != '') {
+                                    let Scores = [];
+                                    docs.forEach((items) => {
+                                        let Obj = [];
+                                        this.tableDates.factor.forEach((item) => {
+                                            Obj.push(items[item.scoring]);
+                                        });
+                                        Scores.push(Obj);
+                                    });
+                                    this.tableDates.point = Scores;
+                                    this.DialogGroup.examineeNumber = docs[0]['Number'];
+                                    this.Information.switchs = false;
+                                }
+                            });
                         } else {
                             this.$alert("查无此人，请先核对考生名单！");
-                            this.Show.enter = true;
                             this.DialogGroup.examineeRegisterNumber = '';
+                            this.Show.enter = true;
                         }
                     })
                 } else {
