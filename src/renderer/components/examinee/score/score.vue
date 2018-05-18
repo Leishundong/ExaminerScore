@@ -2,19 +2,25 @@
 
     <div class="score">
         <div class="dialog">
-            <el-dialog title="面试考生信息"  :visible.sync="Show.dialogScore" width="770px"
+            <el-dialog title="面试考生信息" :visible.sync="Show.dialogScore" width="770px"
                        :before-close="handleClose">
                 <div style="position: absolute;margin-top: -30px;margin-left: 37px" v-if="Show.lastShow">
                     <span style="color: red; font-size: 18px" v-text="DialogGroup.lastNumber"></span>
                     <span style="color: red;font-size: 18px">号考生信息保存成功</span>
                 </div>
                 <div style="margin-left: 37px;margin-top: 10px">
-                    <span class="span">当前为</span><input type="text" @focus="inputFocus"  v-model="DialogGroup.examineeNumber"/><span>号面试考生</span>
-                    <el-button  class="custombutton" @click="jumpNumber">跳过此序号</el-button>
-                    <el-button type="primary"  class="custombutton" style="margin-left: 170px" @click="toNewGroup">开始新的一组</el-button>
+                    <span class="span">当前为</span><input type="text" @focus="inputFocus"
+                                                        v-model="DialogGroup.examineeNumber"/><span>号面试考生</span>
+                    <el-button class="custombutton" @click="jumpNumber">跳过此序号</el-button>
+                    <el-button type="primary" class="custombutton" style="margin-left: 170px" @click="toNewGroup">
+                        开始新的一组
+                    </el-button>
                 </div>
                 <div>
-                    <p>请输入准考证号：<input class="pInput" @focus="inputFocus" v-model="DialogGroup.examineeRegisterNumber" :maxlength="Rulegroup.certificateLength" @keyup.13="KeyfindExaminee"><el-button type="primary" class="pButton" @click="findExaminee">查找</el-button></p>
+                    <p>请输入准考证号：<input class="pInput" @focus="inputFocus" v-model="DialogGroup.examineeRegisterNumber"
+                                      :maxlength="Rulegroup.certificateLength" @keyup.13="KeyfindExaminee">
+                        <el-button type="primary" class="pButton" @click="findExaminee">查找</el-button>
+                    </p>
                 </div>
                 <div v-if="Show.showInformation" style="position: absolute">
                     <p style="margin-top:32px">姓名：<span class="textinput">{{DialogGroup.examineeName}}</span></p>
@@ -23,8 +29,10 @@
                 <p class="pMessage" v-else>请输入准考证号</p>
                 <div class="line"></div>
                 <div style="margin-right: 34px; float: right;margin-top: 14px">
-                    <el-button type="primary" class="footButton"  @click="confirmInformation" :disabled="!Show.showInformation">确定</el-button>
-                    <el-button  class="footButton" @click="canCel">取消</el-button>
+                    <el-button type="primary" class="footButton" @click="confirmInformation"
+                               :disabled="!Show.showInformation">确定
+                    </el-button>
+                    <el-button class="footButton" @click="canCel">取消</el-button>
                 </div>
             </el-dialog>
         </div>
@@ -33,15 +41,18 @@
                 <!--thead-->
                 <tr :style="">
                     <th>考官序号</th>
-                    <th v-for="factors in tableDates.factor">{{factors.scoring}}({{tableDates.num = true ? factors.toplimit:Number(factors.toplimit)/(parseInt(factors.weight)/100)}})</th>
+                    <th v-for="factors in tableDates.factor">
+                        {{factors.scoring}}({{tableDates.num = true ? factors.toplimit : Number(factors.toplimit) / (parseInt(factors.weight) / 100)}})
+                    </th>
                     <th v-if="compute">总分</th>
                 </tr>
                 <!-- //计分//-->
 
-                <tr v-for="(number,row) in tableDates.scores" :style="{backgroundColor:(row%2? '#d8ecf6' : '#fbf7e2')}" >
+                <tr v-for="(number,row) in tableDates.scores" :style="{backgroundColor:(row%2? '#d8ecf6' : '#fbf7e2')}">
                     <td>{{number.Number}}</td>
                     <td v-for="(factors,index) in tableDates.factor">
-                        <input v-model="tableDates.point[row][index]" @focus="inputFocus" :ref="factors.scoring" :data-row="row"  :data-index="index"  @blur="BlurInput"   @keyup.13="nextInput"/>
+                        <input v-model="tableDates.point[row][index]" @focus="inputFocus" :ref="factors.scoring"
+                               :data-row="row" :data-index="index" @blur="BlurInput" @keyup.13="nextInput"/>
                     </td>
                     <td v-text="num(tableDates.point[row],row)" v-if="compute"></td>
                 </tr>
@@ -50,7 +61,8 @@
                     <td v-for="(th,index) in tableDates.factor" v-text="maxs(index)">mx[index]</td>
                     <td v-text="tableDates.SummariseMax" v-if="compute"></td>
                 </tr>
-                <tr :style="{backgroundColor:((tableDates.scores.length+1)%2? '#d8ecf6' : '#fbf7e2') }" v-if="extremums">
+                <tr :style="{backgroundColor:((tableDates.scores.length+1)%2? '#d8ecf6' : '#fbf7e2') }"
+                    v-if="extremums">
                     <td>最低分</td>
                     <td v-for="(th,index) in tableDates.factor" v-text="mins(index)"></td>
                     <td v-text="tableDates.SummariseMin" v-if="compute"></td>
@@ -90,7 +102,7 @@
                         </div>
                     </div>
                     <div class="save-button">
-                        <el-button class="button" @click="saves"  :disabled="valiDateTable">保存</el-button>
+                        <el-button class="button" @click="saves" :disabled="valiDateTable">保存</el-button>
                     </div>
                 </div>
             </div>
@@ -100,102 +112,104 @@
 
 <script>
     let registerNumber = '准考证号';
-    let examineeName   ='姓名';
-    let examineeIdCard ='身份证号';
-    let postGroup      ='岗位分组';
+    let examineeName = '姓名';
+    let examineeIdCard = '身份证号';
+    let postGroup = '面试组别';
     export default {
-        data(){
-            return{
-                Show:{
-                    enter:false,
-                    dialogScore:true,//控制Dialog的显示影藏
-                    showInformation:false,//控制Dialog中考生信息的显示隐藏
-                    isshow:false,//控制右下成绩栏的显示影藏
-                    lastShow:false,
+        data() {
+            return {
+                Show: {
+                    enter: false,
+                    dialogScore: true,//控制Dialog的显示影藏
+                    showInformation: false,//控制Dialog中考生信息的显示隐藏
+                    isshow: false,//控制右下成绩栏的显示影藏
+                    lastShow: false,
                 },
-                Summarises:{
-                    totalScore:[],//存放各个考官的平均分
-                    factorScore:[]//存放各个要素平均分
+                Summarises: {
+                    totalScore: [],//存放各个考官的平均分
+                    factorScore: []//存放各个要素平均分
                 },
-                tableDates:{
-                    factor:[],//存放各个要素的信息，决定列数
-                    scores:[],//存放各个考官的信息，决定行数
-                    point:[],//存放考官对各个要素的打分
-                    Scorer:[],//存放记分员和核分员的信息
-                    mx:[],//存放最大值
-                    mn:[],//存放最小值
-                    refIndex:[],//存放ref信息
-                    Address:'',//存放考试地址,
-                    sum:'',
-                    c:0,
-                    SummariseMax:'',
-                    SummariseMin:''
+                tableDates: {
+                    factor: [],//存放各个要素的信息，决定列数
+                    scores: [],//存放各个考官的信息，决定行数
+                    point: [],//存放考官对各个要素的打分
+                    Scorer: [],//存放记分员和核分员的信息
+                    mx: [],//存放最大值
+                    mn: [],//存放最小值
+                    refIndex: [],//存放ref信息
+                    Address: '',//存放考试地址,
+                    sum: '',
+                    c: 0,
+                    SummariseMax: '',
+                    SummariseMin: ''
                 },
-                Rulegroup:{
-                    certificateLength:'',
-                    computes:'',//通过获取的信息决定总分的计算方法
-                    extremum:'',//决定是否去掉极值
+                Rulegroup: {
+                    certificateLength: '',
+                    computes: '',//通过获取的信息决定总分的计算方法
+                    extremum: '',//决定是否去掉极值
                     //决定权重
-                    writeWeight:'',
-                    interviewWeight:'',
-                    decimal:'',
-                    num:''
+                    writeWeight: '',
+                    interviewWeight: '',
+                    decimal: '',
+                    num: ''
                 },
                 //关于模态框中的属性
-                DialogGroup:{
-                    examineeNumber:'',//模态框中的考生序号
-                    examineeName:'',//绑定通过查询所获得的考生名
-                    examineeIdCard:'',//绑定通过查询所获得的考生身份证号
-                    examineeRegisterNumber:'',//绑定通过查询所获得的考生准考证号
-                    group:'',//绑定通过查询所获得的考生组别
-                    lastNumber:'',
+                DialogGroup: {
+                    examineeNumber: '',//模态框中的考生序号
+                    examineeName: '',//绑定通过查询所获得的考生名
+                    examineeIdCard: '',//绑定通过查询所获得的考生身份证号
+                    examineeRegisterNumber: '',//绑定通过查询所获得的考生准考证号
+                    group: '',//绑定通过查询所获得的考生组别
+                    lastNumber: '',
                 },
                 //关于右上角考生信息栏中的属性与要素
-                Information:{
-                    Numbers:'',//考生序号
-                    Name:'',//考生姓名
-                    IDCard:'',//身份证号
-                    RegisterNumber:'',//准考证号
-                    achievement:''//考生成绩
+                Information: {
+                    Numbers: '',//考生序号
+                    Name: '',//考生姓名
+                    IDCard: '',//身份证号
+                    RegisterNumber: '',//准考证号
+                    achievement: '',//考生成绩
+                    switchs: true
                 },
                 //用来决定和存放考生面试序号
-                Groups:{
-                    GroupNumber:[],//存放当前组号
-                    Group:[{      //存放各个小组
-                        number:[]//存放各个小组的序号
+                Groups: {
+                    GroupNumber: [],//存放当前组号
+                    Group: [{      //存放各个小组
+                        number: []//存放各个小组的序号
                     }],
                 },
-                SaveData:{
-                    ExaminerScore:[],//存放考官评分
-                    Temporary:[],//用于临时存放考官对当前考生评分的对象
+                SaveData: {
+                    ExaminerScore: [],//存放考官评分
+                    Temporary: [],//用于临时存放考官对当前考生评分的对象
                     // 存放考生数组
-                    Achievement:[],//存放考生数据
-                    time:'',//存放保存时间
-                    Summarise:'',//存放总分
-                    adressId:'',
+                    Achievement: [],//存放考生数据
+                    time: '',//存放保存时间
+                    Summarise: '',//存放总分
+                    adressId: '',
                 }
 
             }
         },
-        created(){
+        created() {
             this.Show.showInformation = false;//初始化考生信息的显示状态
             this.initializeGroup();//初始化小组
             this.judgements();
         },
-        activated(){
+        activated() {
             this.judgements();
-          /*  this.getRule();//从数据库获取本场考试所需的各种参数
-            this.getExaminer();//获取考官的情况
-            this.getFactor(); //从数据库获取本场考试所需要素*/
+            /*this.getRule();//从数据库获取本场考试所需的各种参数
+              this.getExaminer();//获取考官的情况
+              this.getFactor(); //从数据库获取本场考试所需要素*/
             this.Show.dialogScore = true;
-            this.$examineedb.find().exec((err,docs)=>{
-                if(docs!=''){
-                    this.$factordb.find({}).exec((err,factordocs)=>{
-                        if(factordocs!=''){
-                            var compare = (prop)=>{
-                                return (obj1,obj2)=>{
+            this.$examineedb.find().exec((err, docs) => {
+                if (docs != '') {
+                    this.$factordb.find({}).exec((err, factordocs) => {
+                        if (factordocs != '') {
+                            var compare = (prop) => {
+                                return (obj1, obj2) => {
                                     var val1 = obj1[prop];
-                                    var val2 = obj2[prop];if (val1 < val2) {
+                                    var val2 = obj2[prop];
+                                    if (val1 < val2) {
                                         return -1;
                                     } else if (val1 > val2) {
                                         return 1;
@@ -206,15 +220,16 @@
                             }; //排序用
                             factordocs.sort(compare("scoring"));
                             this.tableDates.factor = factordocs; //绑定要素信息
-                            this.$examinerdb.find({}).exec((err,examinerdocs)=>{
+                            this.$examinerdb.find({}).exec((err, examinerdocs) => {
                                 console.log(examinerdocs);
-                                if(examinerdocs != ''){
-                                    this.tableDates.scores=[];
+                                if (examinerdocs != '') {
+                                    this.tableDates.scores = [];
                                     //根据序号排序考官
-                                    var compare = (prop)=>{
-                                        return (obj1,obj2)=>{
+                                    var compare = (prop) => {
+                                        return (obj1, obj2) => {
                                             var val1 = obj1[prop];
-                                            var val2 = obj2[prop];if (val1 < val2) {
+                                            var val2 = obj2[prop];
+                                            if (val1 < val2) {
                                                 return -1;
                                             } else if (val1 > val2) {
                                                 return 1;
@@ -225,64 +240,63 @@
                                     };
                                     examinerdocs.sort(compare("Number"));
                                     //获取考官
-                                        for (var i=0;i<examinerdocs.length-2;i++){
-                                            this.tableDates.scores[i] = examinerdocs[i];
-                                            this.tableDates.point.push({
-                                                place:[],
-                                            })
-                                        };
-                                        //获取核分员和记分员
-                                        this.tableDates.Scorer[0] = examinerdocs[examinerdocs.length-2];
-                                        this.tableDates.Scorer[1] = examinerdocs[examinerdocs.length-1];
-
-
-                                    this.$ruledb.find({}).exec((err,ruledocs)=>{
-                                        if(ruledocs !='' ){
-                                            if(ruledocs[0].compute == 'total'){ //判断计分类型
+                                    for (var i = 0; i < examinerdocs.length - 2; i++) {
+                                        this.tableDates.scores[i] = examinerdocs[i];
+                                        this.tableDates.point.push({
+                                            place: [],
+                                        })
+                                    }
+                                    ;
+                                    //获取核分员和记分员
+                                    this.tableDates.Scorer[0] = examinerdocs[examinerdocs.length - 2];
+                                    this.tableDates.Scorer[1] = examinerdocs[examinerdocs.length - 1];
+                                    this.$ruledb.find({}).exec((err, ruledocs) => {
+                                        if (ruledocs != '') {
+                                            if (ruledocs[0].compute == 'total') { //判断计分类型
                                                 this.Rulegroup.computes = true
-                                            }else {
+                                            } else {
                                                 this.Rulegroup.computes = false
                                             }
-                                            if(ruledocs[0].extremum == 'true'){
+                                            if (ruledocs[0].extremum == 'true') {
                                                 this.Rulegroup.extremum = true
-                                            }else {
+                                            } else {
                                                 this.Rulegroup.extremum = false
                                             }
-                                            if(ruledocs[0].decimal =='true'){
+                                            if (ruledocs[0].decimal == 'true') {
                                                 this.Rulegroup.decimal = true
-                                            }else {
+                                            } else {
                                                 this.Rulegroup.decimal = false
                                             }
-                                            if(ruledocs[0].num == 'true'){
+                                            if (ruledocs[0].num == 'true') {
                                                 this.Rulegroup.num = true
-                                            }else {
+                                            } else {
                                                 this.Rulegroup.num = false;
                                             }
                                             this.Rulegroup.certificateLength = Number(ruledocs[0].certificateLength);
                                             this.Rulegroup.interviewWeight = parseInt(ruledocs[0].interviewWeight);
                                             this.Rulegroup.writeWeight = parseInt(ruledocs[0].writeWeight);
-                                        }else {
+                                        } else {
                                             this.$alert("请先前往系统设置进行计分设置！")
                                         }
                                     });
-                                    this.$addre.find({}).exec((err,Addredocs)=>{
-                                        if(Addredocs!=''){
+                                    this.$addre.find({}).exec((err, Addredocs) => {
+                                        if (Addredocs != '') {
                                             console.log(Addredocs);
                                             this.tableDates.Address = Addredocs[0].adress;
                                             this.SaveData.adressId = Addredocs[0].adressId;
-                                        }else {
+                                        } else {
                                             return
                                         }
                                     });
-                                }else {
+                                } else {
                                     this.$alert("请先选择面试室和面试员！")
                                 }
                             })
-                        }else {
+                        } else {
                             this.$alert("请先前往系统设置进行计分设置！")
                         }
                     })
-                }else {
+                } else {
                     this.$alert("请先前往系统设置导入考生信息！");
                 }
             })
@@ -302,14 +316,14 @@
                     return false
                 }
             },
-            valiDateTable(){
+            valiDateTable() {
                 let vali = false;
-                if(this.Information.achievement == ''){
+                if (this.Information.achievement == '') {
                     vali = true
                 }
-                this.tableDates.scores.forEach((item,row)=>{
-                    this.tableDates.factor.forEach((item,index)=>{
-                        if(this.tableDates.point[row][index]==''){
+                this.tableDates.scores.forEach((item, row) => {
+                    this.tableDates.factor.forEach((item, index) => {
+                        if (this.tableDates.point[row][index] == '') {
                             vali = true
                         }
                     })
@@ -317,82 +331,86 @@
                 return vali;
             }
         },
-        methods:{
-            inputFocus(el){
+        methods: {
+            inputFocus(el) {
                 el.currentTarget.select();
                 this.Information.achievement = '';
             },
-            judgements(){
-                if(this.$modify.judgement==1){
+            judgements() {
+                if (this.$modify.judgement == 1) {
                     this.toNewGroup();
                     this.Show.isshow = false;
                     this.$modify.setjudgement(0);
-                    this.tableDates.SummariseMax='';
+                    this.tableDates.SummariseMax = '';
                     this.Information.achievement = '';
-                    this.tableDates.SummariseMin='';
+                    this.tableDates.SummariseMin = '';
                     this.tableDates.point = [];
                 }
             },
-            BlurInput(el){
-                let ref=el.currentTarget;
-                if(ref.value !=''){
-                    if(this.Rulegroup.decimal==true){
-                        if(Number(ref.value)>parseInt(this.tableDates.factor[ref.dataset.index].toplimit)||(ref.value.indexOf('.') == -1|| ref.value.substring(ref.value.indexOf("."),ref.value.length).length>2)){
-                            this.tableDates.point[ref.dataset.row][ref.dataset.index]='';
-                            if(this.$confirm("未对小数位后一位进行打分！或超出分数上限")){
+            BlurInput(el) {
+                let ref = el.currentTarget;
+                if (ref.value != '') {
+                    if (this.Rulegroup.decimal == true) {
+                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length > 2)) {
+                            this.tableDates.point[ref.dataset.row][ref.dataset.index] = '';
+                            if (this.$confirm("未对小数位后一位进行打分！或超出分数上限")) {
                                 ref.value = '';
-                            }else {}
+                            } else {
+                            }
                             return
                         }
-                    }else {
-                        if(Number(ref.value)>parseInt(this.tableDates.factor[ref.dataset.index].toplimit)){
-                            this.tableDates.point[ref.dataset.row][ref.dataset.index]='';
-                            if(this.$confirm("超出分数上限")){
+                    } else {
+                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit)) {
+                            this.tableDates.point[ref.dataset.row][ref.dataset.index] = '';
+                            if (this.$confirm("超出分数上限")) {
                                 ref.value = '';
-                            }else {}
+                            } else {
+                            }
                             return
                         }
                     }
                 }
             },
-            nextInput(el){
-                let ref=el.currentTarget;
+            nextInput(el) {
+                let ref = el.currentTarget;
                 let index = Number(ref.dataset.index);
                 let row = Number(ref.dataset.row);
-                if(index<this.tableDates.factor.length||row<this.tableDates.point.length){
-                    if(ref.value !=''){
-                        if(this.Rulegroup.decimal==true){
-                            if(Number(ref.value)>parseInt(this.tableDates.factor[index].toplimit)||(ref.value.indexOf('.') == -1|| ref.value.substring(ref.value.indexOf("."),ref.value.length).length>2)){
-                                if(this.$confirm("请对也仅对小数位后一位进行打分！或超出分数上限")){
+                if (index < this.tableDates.factor.length || row < this.tableDates.point.length) {
+                    if (ref.value != '') {
+                        if (this.Rulegroup.decimal == true) {
+                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length > 2)) {
+                                if (this.$confirm("请对也仅对小数位后一位进行打分！或超出分数上限")) {
                                     ref.value = '';
-                                }else {}
+                                } else {
+                                }
                                 return
-                            }else{
-                                if((index+1)%this.tableDates.factor.length == 0){
-                                    row=row+1;
-                                    index=0;
+                            } else {
+                                if ((index + 1) % this.tableDates.factor.length == 0) {
+                                    row = row + 1;
+                                    index = 0;
                                     this.$refs[this.tableDates.factor[index].scoring][row].focus();
-                                }else {
-                                    index=index+1;
+                                } else {
+                                    index = index + 1;
                                     this.$refs[this.tableDates.factor[index].scoring][row].focus();
                                 }
                             }
-                        }else {
-                            if(Number(ref.value)>parseInt(this.tableDates.factor[index].toplimit)){
-                                if(this.$confirm("超出分数上限")){
+                        } else {
+                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit)) {
+                                if (this.$confirm("超出分数上限")) {
                                     ref.value = '';
-                                }else {}
+                                } else {
+                                }
                                 return
-                            }else {
-                                if((index+1)%this.tableDates.factor.length == 0){
-                                    if(row == this.tableDates.scores.length-1){
-                                    }else{
-                                        row=row+1;
-                                        index=0;
+                            } else {
+                                if ((index + 1) % this.tableDates.factor.length == 0) {
+                                    if (row == this.tableDates.scores.length - 1) {
+                                    } else {
+                                        row = row + 1;
+                                        index = 0;
                                         this.$refs[this.tableDates.factor[index].scoring][row].focus();
                                     }
-                                }else {
-                                    index=index+1;
+                                } else {
+                                    index = index + 1;
                                     this.$refs[this.tableDates.factor[index].scoring][row].focus();
                                 }
                             }
@@ -409,167 +427,170 @@
                 }*/
             },
             //计算考生成绩
-            sums(){
+            sums() {
                 this.Information.achievement = this.summarise();//调用计算总分的方法
-                this.SaveData.Summarise = (this.SaveData.Achievement['笔试成绩']*(this.Rulegroup.writeWeight/100)+this.Information.achievement*(this.Rulegroup.interviewWeight/100)).toFixed(4);
+                this.SaveData.Summarise = (this.SaveData.Achievement['笔试成绩'] * (this.Rulegroup.writeWeight / 100) + this.Information.achievement * (this.Rulegroup.interviewWeight / 100)).toFixed(4);
             },
             //求各个考官的的总分平均分
-            num(val,row){
-                let num='';//初始化数据
-                let nums=0;//临时数据，求和用
+            num(val, row) {
+                let num = '';//初始化数据
+                let nums = 0;//临时数据，求和用
                 let a = 0;//用来确定表格是否填写完整
-                this.tableDates.factor.forEach((item,index)=>{
-                    let weight=parseInt(item.weight)/100;//根据获取到的信息算权重
-                    if(val[index]!=null){         //判断是否存在评分
-                        if( this.Rulegroup.num==true){
-                            nums+=Number(val[index]);
+                this.tableDates.factor.forEach((item, index) => {
+                    let weight = parseInt(item.weight) / 100;//根据获取到的信息算权重
+                    if (val[index] != null) {         //判断是否存在评分
+                        if (this.Rulegroup.num == true) {
+                            nums += Number(val[index]);
                             a += 1;
-                        }else {
-                            nums+=Number(val[index])*weight;
+                        } else {
+                            nums += Number(val[index]) * weight;
                             a += 1;
                         }
-                        if(a==this.tableDates.factor.length){    //判断是否进行计算
+                        if (a == this.tableDates.factor.length) {    //判断是否进行计算
                             this.Summarises.totalScore[row] = Number(nums);
                             return nums;
                         }
                     }
                 });
-                if(a == this.tableDates.factor.length &&this.tableDates.factor[0]!=null){//判断是否显示
+                if (a == this.tableDates.factor.length && this.tableDates.factor[0] != null) {//判断是否显示
                     num = nums.toFixed(4)
                 }
-                if(this.Summarises.totalScore.length == this.tableDates.scores.length&&this.tableDates.point[0]!=null){
+                if (this.Summarises.totalScore.length == this.tableDates.scores.length && this.tableDates.point[0] != null) {
                     this.Show.isshow = true;
                     let max = 0;
                     let min = 10000;
-                    for(var i=0;i<this.Summarises.totalScore.length;i++){
-                        if(this.Summarises.totalScore[i] != null){
-                            if(this.Summarises.totalScore[i]>=max){
+                    for (var i = 0; i < this.Summarises.totalScore.length; i++) {
+                        if (this.Summarises.totalScore[i] != null) {
+                            if (this.Summarises.totalScore[i] >= max) {
                                 max = this.Summarises.totalScore[i];
                             }
                         }
-                    };
+                    }
+                    ;
                     this.tableDates.SummariseMax = Number(max).toFixed(4);
-                    for(var i=0;i<this.Summarises.totalScore.length;i++){
-                        if(this.Summarises.totalScore[i] != null){
-                            if(this.Summarises.totalScore[i]<=min){
+                    for (var i = 0; i < this.Summarises.totalScore.length; i++) {
+                        if (this.Summarises.totalScore[i] != null) {
+                            if (this.Summarises.totalScore[i] <= min) {
                                 min = this.Summarises.totalScore[i];
                             }
                         }
-                    };
+                    }
+                    ;
                     this.tableDates.SummariseMin = Number(min).toFixed(4);
                 }
                 /*console.log(num)*/
                 return num //返回要显示的值
             },
-            maxs(index){
-                let max='';
-                let min= 0;//初始一个最小的数
-                let a=0;//作用同上
+            maxs(index) {
+                let max = '';
+                let min = 0;//初始一个最小的数
+                let a = 0;//作用同上
                 //比大小
-                for(var i=0;i<this.tableDates.point.length;i++){
-                    if(this.tableDates.point[i][index] != null){
-                        a = a+1;
-                        if(Number(this.tableDates.point[i][index])>min){
+                for (var i = 0; i < this.tableDates.point.length; i++) {
+                    if (this.tableDates.point[i][index] != null) {
+                        a = a + 1;
+                        if (Number(this.tableDates.point[i][index]) > min) {
                             min = Number(this.tableDates.point[i][index]);
                             this.tableDates.mx[index] = min;
                         }
                     }
-                };
-                if(a == this.tableDates.scores.length&&a!=0){
+                }
+                ;
+                if (a == this.tableDates.scores.length && a != 0) {
                     //同上
                     max = min
                 }
                 /*console.log(max)*/
                 return max
             },
-            mins(index){
+            mins(index) {
                 let min = '';
-                let max =10000 ;// 初始一个绝对大的值
+                let max = 10000;// 初始一个绝对大的值
                 let a = 0;//同上
                 //比大小
-                for(var i=0;i<this.tableDates.point.length;i++){
-                    if(this.tableDates.point[i][index] != null){
-                        a = a+1;
-                        if(max>Number(this.tableDates.point[i][index])){
+                for (var i = 0; i < this.tableDates.point.length; i++) {
+                    if (this.tableDates.point[i][index] != null) {
+                        a = a + 1;
+                        if (max > Number(this.tableDates.point[i][index])) {
                             max = Number(this.tableDates.point[i][index])
                             this.tableDates.mn[index] = max
                         }
                     }
                 }
-                if(a == this.tableDates.scores.length&&a!=0){ //同上
+                if (a == this.tableDates.scores.length && a != 0) { //同上
                     min = max
                 }
                 return min
             },
-            average(index){
+            average(index) {
                 let num = 0;//初始一个由于求和的数
                 let nums = '';//初始一个用于求平均数的数
                 let avg = '';//用于返回的数
                 let a = 0;//同上，判断用
                 //通过循环获取同要素各个考官打分情况，并计算
-                for(var i=0;i<this.tableDates.scores.length;i++){
-                    if(this.tableDates.point[i][index] != null){ //确定考官已答打分
+                for (var i = 0; i < this.tableDates.scores.length; i++) {
+                    if (this.tableDates.point[i][index] != null) { //确定考官已答打分
                         num += Number(this.tableDates.point[i][index]);
-                        a = a+1;
-                        if(a == this.tableDates.scores.length){   //判断是否将值传出
-                            if(this.Rulegroup.extremum == true){//判断是否去掉最值
-                                num = num-Number(this.tableDates.mx[index])-Number(this.tableDates.mn[index]);
-                                nums = num/(this.tableDates.scores.length-2);
+                        a = a + 1;
+                        if (a == this.tableDates.scores.length) {   //判断是否将值传出
+                            if (this.Rulegroup.extremum == true) {//判断是否去掉最值
+                                num = num - Number(this.tableDates.mx[index]) - Number(this.tableDates.mn[index]);
+                                nums = num / (this.tableDates.scores.length - 2);
                                 console.log(nums);
                                 this.Summarises.factorScore[index] = nums;
-                            }else {
-                                nums = num/this.tableDates.scores.length;
+                            } else {
+                                nums = num / this.tableDates.scores.length;
                                 this.Summarises.factorScore[index] = nums;
                             }
                         }
                     }
                 }
-                if(a==this.tableDates.scores.length&&this.tableDates.scores[0]!=null){//判断是否显示
+                if (a == this.tableDates.scores.length && this.tableDates.scores[0] != null) {//判断是否显示
                     avg = nums.toFixed(4);
                 }
-                if(this.Summarises.factorScore.length==this.tableDates.factor.length){
+                if (this.Summarises.factorScore.length == this.tableDates.factor.length) {
                     this.Show.isshow = true;
                 }
                 return avg
             },
-            totalpoint(){
+            totalpoint() {
                 let summarise = 0;
-                let num       = 0;
-                let length    = this.tableDates.scores.length;
-                this.tableDates.point.forEach((item,index)=>{  //循环table数据，获取有效打分行数
-                    if(this.Summarises.totalScore[index]!=null){  //根据保存各考官总分的数组判断此考官总分是否存在
+                let num = 0;
+                let length = this.tableDates.scores.length;
+                this.tableDates.point.forEach((item, index) => {  //循环table数据，获取有效打分行数
+                    if (this.Summarises.totalScore[index] != null) {  //根据保存各考官总分的数组判断此考官总分是否存在
                         num += Number(this.Summarises.totalScore[index]); //累加
                     }
                 });
-                if(this.Rulegroup.extremum ==true){
-                    num = num-Number(this.tableDates.SummariseMin)-Number(this.tableDates.SummariseMax);
-                    length = length-2;
+                if (this.Rulegroup.extremum == true) {
+                    num = num - Number(this.tableDates.SummariseMin) - Number(this.tableDates.SummariseMax);
+                    length = length - 2;
                 }
-                summarise = num/length; //求出平均分
+                summarise = num / length; //求出平均分
                 return summarise.toFixed(4)
             },
-            factorSummarise(){
+            factorSummarise() {
                 let summarise = 0;
-                this.tableDates.factor.forEach((item,index)=>{  //根据要素来循环
-                    let weight=parseInt(item.weight)/100; //计算权重
-                    if(this.Summarises.factorScore[index]!=null){  //判断是否计算
-                        if(this.Rulegroup.num == true){//要素平均分相加
-                            summarise+=Number(this.Summarises.factorScore[index]);
-                        }else {
-                            summarise+=Number(this.Summarises.factorScore[index])*weight;
+                this.tableDates.factor.forEach((item, index) => {  //根据要素来循环
+                    let weight = parseInt(item.weight) / 100; //计算权重
+                    if (this.Summarises.factorScore[index] != null) {  //判断是否计算
+                        if (this.Rulegroup.num == true) {//要素平均分相加
+                            summarise += Number(this.Summarises.factorScore[index]);
+                        } else {
+                            summarise += Number(this.Summarises.factorScore[index]) * weight;
                         }
                     }
                 });
                 return summarise.toFixed(4)
 
             },
-            summarise(){
+            summarise() {
                 //分为计算总分平均分和计算要素平均分
-                let summarise = 0 ; //初始一个数用于计算平均分
-                if(this.Rulegroup.computes == true){
-                    summarise=this.totalpoint()
+                let summarise = 0; //初始一个数用于计算平均分
+                if (this.Rulegroup.computes == true) {
+                    summarise = this.totalpoint()
                     //判断是计算类型是否为总分平均分      通过保存各考官总分的数组长度判断要素评分是否填写完整
-                }else{
+                } else {
                     summarise = this.factorSummarise()
                 }
                 return summarise
@@ -589,119 +610,141 @@
 
             },*/
             //查找考生信息
-            findExaminee(){
+            findExaminee() {
                 //根据考号查找
-                    this.$examineedb.find({[registerNumber]:this.DialogGroup.examineeRegisterNumber}).exec((err,docs)=>{
-                        if(docs != ''){
-                            this.DialogGroup.examineeName = docs[0][examineeName];
-                            this.DialogGroup.examineeIdCard= docs[0][examineeIdCard];
-                            this.DialogGroup.group = docs[0][postGroup];
-                            this.SaveData.Achievement = docs[0];
-                            //控制模态框中考生信息显示与否
-                            if(this.DialogGroup.examineeName !=''&&this.DialogGroup.examineeIdCard !=''){
-                                this.Show.showInformation = true;
-                            }
-                        }else {
-                            this.$alert("查无此人，请先核对考生名单！");
-                            this.DialogGroup.examineeRegisterNumber='';
+                this.$examineedb.find({[registerNumber]: this.DialogGroup.examineeRegisterNumber}).exec((err, docs) => {
+                    if (docs != '') {
+                        this.DialogGroup.examineeName = docs[0][examineeName];
+                        this.DialogGroup.examineeIdCard = docs[0][examineeIdCard];
+                        this.DialogGroup.group = docs[0][postGroup];
+                        console.log(docs);
+                        this.SaveData.Achievement = docs[0];
+                        //控制模态框中考生信息显示与否
+                        if (this.DialogGroup.examineeName != '' && this.DialogGroup.examineeIdCard != '') {
+                            this.Show.showInformation = true;
                         }
-                    })
+                        this.$examinerScore.find({[registerNumber]: this.DialogGroup.examineeRegisterNumber}).sort({"考官序号": 1}).exec((err, docs) => {
+                            if (docs != '') {
+                                let Scores = [];
+                                docs.forEach((items) => {
+                                    let Obj = [];
+                                    this.tableDates.factor.forEach((item) => {
+                                        Obj.push(items[item.scoring]);
+                                    });
+                                    Scores.push(Obj);
+                                });
+                                this.tableDates.point = Scores;
+                                this.DialogGroup.examineeNumber = docs[0]['Number'];
+                                this.Information.switchs = false;
+                            }
+                        });
+                    } else {
+                        this.$alert("查无此人，请先核对考生名单！");
+                        this.DialogGroup.examineeRegisterNumber = '';
+                    }
+                })
             },
-            KeyfindExaminee(){
+            KeyfindExaminee() {
                 //根据考号查找
-                if(this.Show.enter==false){
-                    this.$examineedb.find({[registerNumber]:this.DialogGroup.examineeRegisterNumber}).exec((err,docs)=>{
-                        if(docs != ''){
+                if (this.Show.enter == false) {
+                    this.$examineedb.find({[registerNumber]: this.DialogGroup.examineeRegisterNumber}).exec((err, docs) => {
+                        if (docs != '') {
                             this.DialogGroup.examineeName = docs[0][examineeName];
-                            this.DialogGroup.examineeIdCard= docs[0][examineeIdCard];
+                            this.DialogGroup.examineeIdCard = docs[0][examineeIdCard];
                             this.DialogGroup.group = docs[0][postGroup];
                             this.SaveData.Achievement = docs[0];
                             //控制模态框中考生信息显示与否
-                            if(this.DialogGroup.examineeName !=''&&this.DialogGroup.examineeIdCard !=''){
+                            if (this.DialogGroup.examineeName != '' && this.DialogGroup.examineeIdCard != '') {
                                 this.Show.showInformation = true;
                             }
-                        }else {
+                        } else {
                             this.$alert("查无此人，请先核对考生名单！");
-                            this.Show.enter=true;
-                            this.DialogGroup.examineeRegisterNumber='';
+                            this.Show.enter = true;
+                            this.DialogGroup.examineeRegisterNumber = '';
                         }
                     })
-                }else {
+                } else {
                     this.Show.enter = false;
                 }
             },
             //对右上角考生信息栏赋值
-            confirmInformation(){
-                this.Information.Name =this.DialogGroup.examineeName;
-                this.Information.IDCard=this.DialogGroup.examineeIdCard;
-                this.Information.RegisterNumber=this.DialogGroup.examineeRegisterNumber;
+            confirmInformation() {
+                this.Information.Name = this.DialogGroup.examineeName;
+                this.Information.IDCard = this.DialogGroup.examineeIdCard;
+                this.Information.RegisterNumber = this.DialogGroup.examineeRegisterNumber;
                 this.Information.Numbers = this.DialogGroup.examineeNumber;
                 //隐藏Dailog
                 this.Show.dialogScore = false;
                 this.Show.showsummarise = false;
             },
             //进行考生分组
-            initializeGroup(){
-                if(this.Groups.GroupNumber.length==0){ //初次进入对分组进行初始化
+            initializeGroup() {
+                if (this.Groups.GroupNumber.length == 0) { //初次进入对分组进行初始化
                     this.Groups.GroupNumber[0] = 1;
                     this.Groups.Group[0].number[0] = 1;
-                    this.DialogGroup.examineeNumber =  this.Groups.Group[0].number[0] ; //对Dialog页面的考生序号进行赋值
-                }else if(this.Groups.GroupNumber.length == this.Groups.Group.length){ //常规的考生序号变化
-                    let groupNumber =  this.Groups.GroupNumber.length; //确定当前考生所在组序
-                    for(var i=0;i<groupNumber;i++){
-                        if(i==groupNumber-1){ //取到当前组号
-                            let examinee= this.Groups.Group[i].number.length; //取到当前考位置
-                            let examineeNumber=this.DialogGroup.examineeNumber;//获取当前序号
-                            this.Groups.Group[i].number[examinee] = Number(examineeNumber)+1;//向下添加一位新考号供下一考生使用
-                            this.DialogGroup.examineeNumber = this.Groups.Group[i].number[examinee];//将新序号赋予Dialog的考生序号属性，以供显示
-                            break;//跳出循环
+                    this.DialogGroup.examineeNumber = this.Groups.Group[0].number[0]; //对Dialog页面的考生序号进行赋值
+                } else if (this.Groups.GroupNumber.length == this.Groups.Group.length) { //常规的考生序号变化
+                    let groupNumber = this.Groups.GroupNumber.length; //确定当前考生所在组序
+                    for (var i = 0; i < groupNumber; i++) {
+                        if (i == groupNumber - 1) { //取到当前组号
+                            if (this.Information.switchs == false) {
+                                let examinee = this.Groups.Group[i].number.length; //取到当前考位置
+                                let examineeNumber = Number(this.Groups.Group[i].number[examinee - 1]);//获取当前序号
+                                this.DialogGroup.examineeNumber = examineeNumber;//将新序号赋予Dialog的考生序号属性，以供显示
+                                this.Information.switchs = true;
+                                break;//跳出循环
+                            } else {
+                                let examinee = this.Groups.Group[i].number.length; //取到当前考位置
+                                let examineeNumber = Number(this.Groups.Group[i].number[examinee - 1]) + 1;//获取当前序号
+                                this.Groups.Group[i].number[examinee] = Number(examineeNumber);//向下添加一位新考号供下一考生使用
+                                this.DialogGroup.examineeNumber = this.Groups.Group[i].number[examinee];//将新序号赋予Dialog的考生序号属性，以供显示
+                                break;//跳出循环
+                            }
                         }
                     }
-                }else{ //当考生组数 与 存放考生组号 的数组长度不一致，即开始新的一组
+                } else { //当考生组数 与 存放考生组号 的数组长度不一致，即开始新的一组
                     let num = this.Groups.GroupNumber.length; //初始化一个num，赋予当前组号
                     this.Groups.Group.push({
-                        number:[]  //考生组的数组新增一个number数组，用于存放序号
+                        number: []  //考生组的数组新增一个number数组，用于存放序号
                     });
-                    this.Groups.Group[num-1].number[0] = 1;//初始化数组
-                    this.DialogGroup.examineeNumber =  this.Groups.Group[num-1].number[0] ; //赋予序号
+                    this.Groups.Group[num - 1].number[0] = 1;//初始化数组
+                    this.DialogGroup.examineeNumber = this.Groups.Group[num - 1].number[0]; //赋予序号
                 }
             },
             //新增一组
-            toNewGroup(){
-                this.Groups.GroupNumber[this.Groups.GroupNumber.length] = this.Groups.GroupNumber.length+1; //大组序号加一
+            toNewGroup() {
+                this.Groups.GroupNumber[this.Groups.GroupNumber.length] = this.Groups.GroupNumber.length + 1; //大组序号加一
                 this.initializeGroup();//调用方法初始化新数组
-                this.DialogGroup.lastNumber='';
-                this.Show.lastShow=false;
+                this.DialogGroup.lastNumber = '';
+                this.Show.lastShow = false;
             },
             //修改准考证号
-            modifyNumber(){
+            modifyNumber() {
                 this.Show.dialogScore = true;
             },
-            saveExaminerScore(){
+            saveExaminerScore() {
                 /*以下为保存各个考官评分数据*/
                 //获取考官人数
                 let examinerNumber = this.tableDates.scores.length;
-                let groupNumber = this.Groups.GroupNumber.length-1;
                 //循环打印每个考官所给分数
-                for(var i=0;i<examinerNumber;i++){
+                for (var i = 0; i < examinerNumber; i++) {
                     let examobj = {}; //临时存放成绩
                     //先将可直接获取数据存入对象
-                    examobj[i]={
-                        '准考证号':this.Information.RegisterNumber,
-                        '姓名':this.Information.Name,
-                        '面试室':this.tableDates.Address,
-                        '考官姓名':this.tableDates.scores[i].Name,
-                        '考官序号':this.tableDates.scores[i].Number,
-                        '记分员':this.tableDates.Scorer[0].scorerName,
-                        '核分员':this.tableDates.Scorer[1].checkName,
-                        '面试组别':this.DialogGroup.group,
-                        GroupNumber:this.Groups.GroupNumber[this.Groups.GroupNumber.length-1],
-                        Number:this.Groups.Group[groupNumber].number[this.Groups.Group[groupNumber].number.length-1]
+                    examobj[i] = {
+                        '准考证号': this.Information.RegisterNumber,
+                        '姓名': this.Information.Name,
+                        '面试室': this.tableDates.Address,
+                        '考官姓名': this.tableDates.scores[i].Name,
+                        '考官序号': this.tableDates.scores[i].Number,
+                        '记分员': this.tableDates.Scorer[0].scorerName,
+                        '核分员': this.tableDates.Scorer[1].checkName,
+                        '面试组别': this.DialogGroup.group,
+                        Number: this.Information.Numbers
                     };
                     //在根据要素数获取每行各列成绩
-                    this.tableDates.factor.forEach((item,index) => {
-                        examobj[i][item.scoring]={
-                            Score:this.tableDates.point[i][index]
+                    this.tableDates.factor.forEach((item, index) => {
+                        examobj[i][item.scoring] = {
+                            Score: this.tableDates.point[i][index]
                         };
                         //还原tableDates数据
                         this.tableDates.point[i][index] = null;
@@ -710,23 +753,26 @@
                     this.SaveData.Temporary.push(examobj);
                     //还原临时对象
                     examobj = {};
-                };
+                }
+                ;
                 //简单的整理临时数组，去除无用的深层对象，使数组更清楚灵活。
-                for(var i=0;i<examinerNumber;i++){
-                    for(var j=0;j<examinerNumber;j++){
-                        if(this.SaveData.Temporary[i][j] != null){
+                for (var i = 0; i < examinerNumber; i++) {
+                    for (var j = 0; j < examinerNumber; j++) {
+                        if (this.SaveData.Temporary[i][j] != null) {
                             this.SaveData.ExaminerScore[i] = this.SaveData.Temporary[i][j];
                         }
                     }
-                };
+                }
+                ;
                 //是数组扁平化
-                for(var i=0;i<examinerNumber;i++){
-                    for(var j=0;j<this.tableDates.factor.length;j++){
-                        if(this.SaveData.ExaminerScore[i][this.tableDates.factor[j].scoring] != null){
+                for (var i = 0; i < examinerNumber; i++) {
+                    for (var j = 0; j < this.tableDates.factor.length; j++) {
+                        if (this.SaveData.ExaminerScore[i][this.tableDates.factor[j].scoring] != null) {
                             this.SaveData.ExaminerScore[i][this.tableDates.factor[j].scoring] = this.SaveData.ExaminerScore[i][this.tableDates.factor[j].scoring].Score;
                         }
                     }
-                };
+                }
+                ;
                 //还原临时数组
                 this.SaveData.Temporary = [];
                 //存入数据库
@@ -734,40 +780,26 @@
                 });
                 //还原评分数组
                 this.SaveData.ExaminerScore = [];
-                /*this.$examinerScore.remove({},{multi:true},function (err,FactorRemove) {
-                });*/
 
             },
-            saveAchievement(){
-                let groupNumber = this.Groups.GroupNumber.length-1;
+            saveAchievement() {
                 this.SaveData.Achievement['面试成绩'] = this.Information.achievement;
                 this.SaveData.Achievement['总成绩'] = this.SaveData.Summarise;
                 this.SaveData.Achievement['保存时间'] = this.SaveData.time;
-                this.SaveData.Achievement['面试序号'] = this.Groups.Group[groupNumber].number[this.Groups.Group[groupNumber].number.length-1];
+                this.SaveData.Achievement['面试序号'] = this.Information.Numbers;
                 this.SaveData.Achievement['面试室'] = this.tableDates.Address;
                 this.SaveData.Achievement['面试点'] = this.SaveData.adressId;
-                /*this.SaveData.Achievement.push({
-                    '准考证号':this.Information.RegisterNumber,
-                    '姓名':this.Information.Name,
-                    '身份证':this.Information.IDCard,
-                    '面试成绩':this.Information.achievement,
-                    '面试组别':this.DialogGroup.group,
-                    '面试序号':this.Groups.Group[groupNumber].number[this.Groups.Group[groupNumber].number.length-1],
-                    '保存时间':this.SaveData.time,
-                    GroupNumber:this.Groups.GroupNumber[groupNumber],
-                });*/
                 //将考生成绩存入data
                 this.SaveData.Temporary.push(this.SaveData.Achievement);
-                this.$achievement.insert(this.SaveData.Temporary, function (err,docs){
+                this.$achievement.insert(this.SaveData.Temporary, function (err, docs) {
                 });
-                this.$achievement.find().exec((err,docs)=>{
-
+                this.$achievement.find().exec((err, docs) => {
                 });
                 /*this.$achievement.remove({},{multi:true},function (err,ExaminerRemove) {
                 });*/
                 //还原考生成绩数组
                 this.SaveData.Achievement = [];
-                this.SaveData.Temporary=[];
+                this.SaveData.Temporary = [];
                 /*this.$achievement.remove({},{multi:true},function (err,FactorRemove) {
                 });*/
                 //还原Information数据
@@ -778,84 +810,81 @@
                 this.DialogGroup.group = '';
                 this.SaveData.Summarise = '';
             },
-            saves(){
-                if(this.Information.achievement!=''){
-                    this.$examinerScore.find({'准考证号':this.Information.RegisterNumber}).exec((err,docs)=>{
+            saves() {
+                if (this.Information.achievement != '') {
+                    this.$examinerScore.find({'准考证号': this.Information.RegisterNumber}).exec((err, docs) => {
                         /*以下为保存各个考官评分数据*/
-                        this.SaveData.time=this.getNowFormatDate();
-                        if(docs==''){
+                        this.SaveData.time = this.getNowFormatDate();
+                        if (docs == '') {
 
                             this.saveExaminerScore();
                             /*-------------------------------------------------------------------------------------*/
                             /*以下为保存考生成绩*/
                             this.saveAchievement();
                             //还原数据
-                            this.DialogGroup.lastNumber=this.Information.Numbers;
+                            this.DialogGroup.lastNumber = this.Information.Numbers;
                             this.Summarises.factorScore = [];
                             this.Summarises.totalScore = [];
                             this.DialogGroup.examineeRegisterNumber = '';
                             this.DialogGroup.examineeName = '';
                             this.DialogGroup.examineeIdCard = '';
                             this.Information.Numbers = '';
-                            this.tableDates.SummariseMin='';
-                            this.tableDates.SummariseMax='';
+                            this.tableDates.SummariseMin = '';
+                            this.tableDates.SummariseMax = '';
                             //显示Dialog
                             this.Show.dialogScore = true;
-                            this.Show.showInformation=false;
+                            this.Show.showInformation = false;
                             this.Show.isshow = false;
                             this.Show.lastShow = true;
                             this.tableDates.a = 0;
                             this.tableDates.b = 0;
                             //调用排序方法
                             this.initializeGroup();
-                        }else {
-                            this.$confirm('当前考生已存在，是否替换成绩？')
-                                .then(_ => {
-                                    this.$achievement.remove({'准考证号':this.Information.RegisterNumber},{multi:true},function (err,AchieveRemove) {
-                                    });
-                                    this.$examinerScore.remove({'准考证号':this.Information.RegisterNumber},{multi:true},function (err,ExaminerRemove) {
-                                    });
-                                    this.saveExaminerScore();
-                                    this.saveAchievement();
-                                    //还原数据
-                                    this.DialogGroup.lastNumber=this.Information.Numbers;
-                                    this.Summarises.factorScore = [];
-                                    this.Summarises.totalScore = [];
-                                    this.DialogGroup.examineeRegisterNumber = '';
-                                    this.DialogGroup.examineeName = '';
-                                    this.DialogGroup.examineeIdCard = '';
-                                    this.Information.Numbers = '';
-                                    this.tableDates.SummariseMin='';
-                                    this.tableDates.SummariseMax='';
-                                    //显示Dialog
-                                    this.Show.dialogScore = true;
-                                    this.Show.showInformation=false;
-                                    this.Show.isshow = false;
-                                    this.Show.lastShow = true;
-                                    this.tableDates.a = 0;
-                                    this.tableDates.b = 0;
-                                    //调用排序方法
-                                    this.initializeGroup();
-                                })
-                                .catch(_ => {});
+                        } else {
+                            this.$achievement.remove({'准考证号': this.Information.RegisterNumber}, {multi: true}, function (err, AchieveRemove) {
+                            });
+                            this.$examinerScore.remove({'准考证号': this.Information.RegisterNumber}, {multi: true}, function (err, ExaminerRemove) {
+                            });
+                            this.saveExaminerScore();
+                            this.saveAchievement();
+                            //还原数据
+                            this.DialogGroup.lastNumber = this.Information.Numbers;
+                            this.Summarises.factorScore = [];
+                            this.Summarises.totalScore = [];
+                            this.DialogGroup.examineeRegisterNumber = '';
+                            this.DialogGroup.examineeName = '';
+                            this.DialogGroup.examineeIdCard = '';
+                            this.Information.Numbers = '';
+                            this.tableDates.SummariseMin = '';
+                            this.tableDates.SummariseMax = '';
+                            //显示Dialog
+                            this.Show.dialogScore = true;
+                            this.Show.showInformation = false;
+                            this.Show.isshow = false;
+                            this.Show.lastShow = true;
+                            this.tableDates.a = 0;
+                            this.tableDates.b = 0;
+                            //调用排序方法
+                            this.initializeGroup();
                         }
                     });
 
-                }else {
+                } else {
                     this.$alert('请先计算面试总分！')
                 }
+
             },
             //跳过当前序号
-            jumpNumber(){
-                let groupNum = this.Groups.GroupNumber.length-1; //获取当前组
+            jumpNumber() {
+                let groupNum = this.Groups.GroupNumber.length - 1; //获取当前组
                 let num = this.DialogGroup.examineeNumber;//获取当前数
                 //跳过序号
-                if(Number(num) == 1){//当序号为一时
-                    this.Groups.Group[groupNum].number[1] = Number(num)+1;
+                if (Number(num) == 1) {//当序号为一时
+                    this.Groups.Group[groupNum].number[1] = Number(num) + 1;
                     this.DialogGroup.examineeNumber = this.Groups.Group[groupNum].number[1]; //直接赋值
-                }else{
+                } else {
                     let number = this.Groups.Group[groupNum].number.length;
-                    this.Groups.Group[groupNum].number[number] = Number(num)+1; //序号加一
+                    this.Groups.Group[groupNum].number[number] = Number(num) + 1; //序号加一
                     this.DialogGroup.examineeNumber = this.Groups.Group[groupNum].number[number] //赋值
                 }
             },
@@ -882,42 +911,46 @@
 
                         done();
                     })
-                    .catch(_ => {});
+                    .catch(_ => {
+                    });
             },
-            canCel(){
+            canCel() {
                 this.$confirm('确认关闭？')
                     .then(_ => {
                         this.Show.dialogScore = false
                     })
-                    .catch(_ => {});
+                    .catch(_ => {
+                    });
             }
         },
     }
 </script>
 
-<style  lang="scss" rel="stylesheet/scss" scoped>
+<style lang="scss" rel="stylesheet/scss" scoped>
 
-    @font-face
-    {
-        font-family:American typewriter;
+    @font-face {
+        font-family: American typewriter;
         src: url('../score/font/american typewriter .ttf');
     }
-    @font-face
-    {
-        font-family:adobe-regular;
+
+    @font-face {
+        font-family: adobe-regular;
         src: url('../score/font/adobeheitistd-regular.otf');
     }
-    table{
+
+    table {
         width: calc(100% - 400px);
         height: calc(100% - 188px);
         margin-left: 8px;
         margin-top: 8px;
         border: 1px solid #cccccc;
     }
-    td{
+
+    td {
         text-align: center;
     }
-    th,td,tr{
+
+    th, td, tr {
         width: 246px;
         font-size: 24px;
         text-align: center;
@@ -926,20 +959,20 @@
         color: #000000;
     }
 
-    .score{
+    .score {
         width: 100%;
         height: calc(100% - 158px);
-        .dialog{
-            .line{
+        .dialog {
+            .line {
                 margin-top: 160px;
                 border: 1px solid #404040;
                 width: 100%;
             }
-            span{
+            span {
                 font-size: 30px;
                 font-family: adobe-regular;
             }
-            input{
+            input {
                 width: 77px;
                 height: 85px;
                 font-size: 36px;
@@ -948,30 +981,30 @@
                 border: #55daff 1px solid;
                 border-radius: 8px;
             }
-            p{
+            p {
                 margin-top: 40px;
                 margin-left: 37px;
                 font-size: 30px;
                 font-family: adobe-regular;
             }
-            .pMessage{
+            .pMessage {
                 position: absolute;
                 font-size: 18px;
                 margin-top: 120px;
                 color: #fe6b6b;
             }
-            .pInput{
+            .pInput {
                 font-size: 30px;
                 height: 44px;
                 width: 318px;
                 text-align: left;
             }
-            .textinput{
+            .textinput {
                 margin-left: 19px;
                 font-size: 30px;
                 color: #007f00;
             }
-            .pButton{
+            .pButton {
                 display: inline-block;
                 position: absolute;
                 text-align: center;
@@ -984,14 +1017,14 @@
                 background: #ff654f;
                 border: #ff654f 1px solid;
             }
-            .footButton{
+            .footButton {
                 font-size: 24px;
                 text-align: center;
                 vertical-align: middle;
                 width: 120px;
                 height: 45px;
             }
-            .custombutton{
+            .custombutton {
                 display: inline-block;
                 position: absolute;
                 font-size: 21px;
@@ -999,12 +1032,12 @@
                 margin-left: 10px;
             }
         }
-        .score-table-box{
+        .score-table-box {
             float: left;
             width: 100%;
             height: 100%;
-            .table{
-                input{
+            .table {
+                input {
                     width: 100%;
                     height: 100%;
                     border: none;
@@ -1012,44 +1045,44 @@
                     background: transparent;
                     text-align: center;
                 }
-                input:focus{
+                input:focus {
                     background: #c7ffae;
                 }
             }
         }
-        .score-interviewer-box{
+        .score-interviewer-box {
             float: left;
             margin-left: -350px;
             margin-top: 10px;
             width: 330px;
             height: 100%;
-            .interviewer-message{
+            .interviewer-message {
                 width: 320px;
                 height: 220px;
                 border: #cccccc 1px solid;
                 border-radius: 15px;
-                .information{
+                .information {
                     margin-top: 18px;
-                    p{
+                    p {
                         padding-bottom: 25px;
                         margin-left: 10px;
                         font-size: 16px;
                         font-family: adobe-regular;
                     }
-                    span{
+                    span {
                         margin-left: 12px;
                         font-size: 16px;
                         color: #55a532;
                     }
                 }
             }
-            .infor-button{
+            .infor-button {
                 text-align: center;
                 margin-top: 5px;
-                .compute{
-                    cursor:pointer;
+                .compute {
+                    cursor: pointer;
                     width: 94px;
-                    padding:5.5px 30px;
+                    padding: 5.5px 30px;
                     height: 31px;
                     background: #55a532;
                     font-size: 16px;
@@ -1057,10 +1090,10 @@
                     border-radius: 7px;
                     font-family: adobe-regular;
                 }
-                .modify-number{
+                .modify-number {
                     width: 94px;
                     margin-left: 28px;
-                    padding:5.5px 30px;
+                    padding: 5.5px 30px;
                     height: 31px;
                     background: #ff654f;
                     font-size: 16px;
@@ -1069,15 +1102,15 @@
                     font-family: adobe-regular;
                 }
             }
-            .operate{
+            .operate {
                 width: 320px;
                 margin-top: 12px;
-                .operate-message{
+                .operate-message {
                     height: 112px;
                     width: 320px;
                     border-radius: 8px;
                     background: #ffa66d;
-                    p{
+                    p {
                         position: absolute;
                         font-size: 24px;
                         color: #b84947;
@@ -1085,7 +1118,7 @@
                         margin-top: 26px;
                         font-family: adobe-regular;
                     }
-                    span{
+                    span {
                         position: absolute;
                         padding-top: 75px;
                         margin-left: 51px;
@@ -1093,18 +1126,18 @@
                         color: #b84947;
                     }
                 }
-                .save{
+                .save {
                     width: 320px;
                     height: 210px;
                     background: white;
                     border-radius: 15px 15px 12px 12px;
                     border: #cccccc 1px solid;
-                    .head{
+                    .head {
                         height: 47px;
                         background: #cccccc;
                         border-radius: 12px 12px 0px 0px;
                         border: #cccccc 1px solid;
-                        .head-text{
+                        .head-text {
                             position: absolute;
                             font-size: 22px;
                             font-family: adobe-regular;
@@ -1112,32 +1145,32 @@
                             margin-top: 13px;
                         }
                     }
-                    .achievement-text{
+                    .achievement-text {
                         width: 100%;
-                        .text-box{
+                        .text-box {
                             width: 50%;
                             margin-left: 25%;
-                           .text{
-                               position: absolute;
-                               text-align: center;
-                               margin-top: 36px;
-                               font-size: 45px;
-                               color: #ff654f;
-                               font-family: adobe-regular;
-                           }
+                            .text {
+                                position: absolute;
+                                text-align: center;
+                                margin-top: 36px;
+                                font-size: 45px;
+                                color: #ff654f;
+                                font-family: adobe-regular;
+                            }
                         }
                     }
-                    .save-button{
-                        margin-top:40px;
+                    .save-button {
+                        margin-top: 40px;
                         margin-left: 180px;
-                        .button{
+                        .button {
                             color: white;
                             margin-top: 75px;
                             background: #ff654f;
                             border: #ff654f 1px solid;
                             width: 94px;
                             height: 31px;
-                            padding:5.5px 30px;
+                            padding: 5.5px 30px;
                             border-radius: 8px;
                             font-family: adobe-regular;
                         }
