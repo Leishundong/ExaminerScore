@@ -74,7 +74,8 @@
                el.currentTarget.select();
            },
            getExaminerScoring(){
-               this.$examinerScore.find({}).sort({'GroupNumber':1,'Number':2,'考官序号':3}).exec((err,docs)=>{
+               this.$examinerScore.find({}).sort({'面试组别':1,'Number':2,'考官序号':3}).exec((err,docs)=>{
+                   console.log(docs)
                    this.ExaminerScore = docs;
                    this.allindex = docs.length;
                    this.allpage = Math.ceil(docs.length/7);
