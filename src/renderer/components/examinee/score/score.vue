@@ -348,16 +348,23 @@
             },
             keyupInput(el){
                 let ref = el.currentTarget;
-                if(this.Rulegroup.decimal == true){
-                    let last = el.timeStamp;
-                    //利用event的timeStamp来标记时间，这样每次的keyup事件都会修改last的值，注意last必需为全局变量
-                    setTimeout(function(){    //设时延迟0.5s执行
-                        if(last-el.timeStamp==0&&ref.value.indexOf('.') == -1&&ref.value != '')
-                        //如果时间差为0（也就是你停止输入0.5s之内都没有其它的keyup事件发生）则做你想要做的事
-                        {
-                            ref.value = ref.value+'.';
+                if(ref.value != ''){
+                    if(isNaN(Number(ref.value))==false){
+                        if(this.Rulegroup.decimal == true){
+                            let last = el.timeStamp;
+                            //利用event的timeStamp来标记时间，这样每次的keyup事件都会修改last的值，注意last必需为全局变量
+                            setTimeout(function(){    //设时延迟0.5s执行
+                                if(last-el.timeStamp==0&&ref.value.indexOf('.') == -1&&ref.value != '')
+                                //如果时间差为0（也就是你停止输入0.5s之内都没有其它的keyup事件发生）则做你想要做的事
+                                {
+                                    ref.value = ref.value+'.';
+                                }
+                            },400);
                         }
-                    },400);
+                    }else {
+                        this.$alert('请输入数字');
+                        ref.value = '';
+                    }
                 }
             },
             BlurInput(el) {
@@ -385,6 +392,7 @@
                 let index = Number(ref.dataset.index);
                 let row = Number(ref.dataset.row);
                 if (index < this.tableDates.factor.length || row < this.tableDates.point.length) {
+                    console.log();
                     if (ref.value != '') {
                         if (this.Rulegroup.decimal == true) {
                             if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length != 2 )) {
