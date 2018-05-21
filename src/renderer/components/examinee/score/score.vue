@@ -52,7 +52,7 @@
                     <td>{{number.Number}}</td>
                     <td v-for="(factors,index) in tableDates.factor">
                         <input v-model="tableDates.point[row][index]" @focus="inputFocus" :ref="factors.scoring"
-                               :data-row="row" :data-index="index" @blur="BlurInput" @keyup.13="nextInput"/>
+                               :data-row="row" :data-index="index" @keyup="keyupInput" @blur="BlurInput" @keyup.13="nextInput"/>
                     </td>
                     <td v-text="num(tableDates.point[row],row)" v-if="compute"></td>
                 </tr>
@@ -221,7 +221,6 @@
                             factordocs.sort(compare("scoring"));
                             this.tableDates.factor = factordocs; //绑定要素信息
                             this.$examinerdb.find({}).exec((err, examinerdocs) => {
-                                console.log(examinerdocs);
                                 if (examinerdocs != '') {
                                     this.tableDates.scores = [];
                                     //根据序号排序考官
@@ -281,7 +280,6 @@
                                     });
                                     this.$addre.find({}).exec((err, Addredocs) => {
                                         if (Addredocs != '') {
-                                            console.log(Addredocs);
                                             this.tableDates.Address = Addredocs[0].adress;
                                             this.SaveData.adressId = Addredocs[0].adressId;
                                         } else {
@@ -340,6 +338,7 @@
                 if (this.$modify.judgement == 1) {
                     this.toNewGroup();
                     this.Show.isshow = false;
+                    this.DialogGroup.examineeRegisterNumber='';
                     this.$modify.setjudgement(0);
                     this.tableDates.SummariseMax = '';
                     this.Information.achievement = '';
@@ -347,11 +346,25 @@
                     this.tableDates.point = [];
                 }
             },
+            keyupInput(el){
+                let ref = el.currentTarget;
+                if(this.Rulegroup.decimal == true){
+                    let last = el.timeStamp;
+                    //利用event的timeStamp来标记时间，这样每次的keyup事件都会修改last的值，注意last必需为全局变量
+                    setTimeout(function(){    //设时延迟0.5s执行
+                        if(last-el.timeStamp==0&&ref.value.indexOf('.') == -1&&ref.value != '')
+                        //如果时间差为0（也就是你停止输入0.5s之内都没有其它的keyup事件发生）则做你想要做的事
+                        {
+                            ref.value = ref.value+'.';
+                        }
+                    },400);
+                }
+            },
             BlurInput(el) {
                 let ref = el.currentTarget;
                 if (ref.value != '') {
                     if (this.Rulegroup.decimal == true) {
-                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length == 1)) {
+                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length != 2)) {
                             this.tableDates.point[ref.dataset.row][ref.dataset.index] = '';
                             this.$alert("请对也仅对小数位后一位进行打分！或超出分数上限");
                             ref.value = '';
@@ -374,7 +387,7 @@
                 if (index < this.tableDates.factor.length || row < this.tableDates.point.length) {
                     if (ref.value != '') {
                         if (this.Rulegroup.decimal == true) {
-                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length == 1 )) {
+                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length != 2 )) {
                                 this.$alert("请对也仅对小数位后一位进行打分！或超出分数上限");
                                 ref.value = '';
                                 return
@@ -528,7 +541,6 @@
                             if (this.Rulegroup.extremum == true) {//判断是否去掉最值
                                 num = num - Number(this.tableDates.mx[index]) - Number(this.tableDates.mn[index]);
                                 nums = num / (this.tableDates.scores.length - 2);
-                                console.log(nums);
                                 this.Summarises.factorScore[index] = nums;
                             } else {
                                 nums = num / this.tableDates.scores.length;
@@ -609,7 +621,6 @@
                         this.DialogGroup.examineeName = docs[0][examineeName];
                         this.DialogGroup.examineeIdCard = docs[0][examineeIdCard];
                         this.DialogGroup.group = docs[0][postGroup];
-                        console.log(docs);
                         this.SaveData.Achievement = docs[0];
                         //控制模态框中考生信息显示与否
                         if (this.DialogGroup.examineeName != '' && this.DialogGroup.examineeIdCard != '') {
