@@ -351,21 +351,17 @@
                 let ref = el.currentTarget;
                 if (ref.value != '') {
                     if (this.Rulegroup.decimal == true) {
-                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length > 2)) {
+                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length == 1)) {
                             this.tableDates.point[ref.dataset.row][ref.dataset.index] = '';
-                            if (this.$confirm("未对小数位后一位进行打分！或超出分数上限")) {
-                                ref.value = '';
-                            } else {
-                            }
+                            this.$alert("请对也仅对小数位后一位进行打分！或超出分数上限");
+                            ref.value = '';
                             return
                         }
                     } else {
-                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit)) {
+                        if (Number(ref.value) > parseInt(this.tableDates.factor[ref.dataset.index].toplimit)||ref.value.indexOf('.') != -1 ) {
                             this.tableDates.point[ref.dataset.row][ref.dataset.index] = '';
-                            if (this.$confirm("超出分数上限")) {
-                                ref.value = '';
-                            } else {
-                            }
+                            this.$alert("输入格式错误");
+                            ref.value = '';
                             return
                         }
                     }
@@ -378,11 +374,9 @@
                 if (index < this.tableDates.factor.length || row < this.tableDates.point.length) {
                     if (ref.value != '') {
                         if (this.Rulegroup.decimal == true) {
-                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length > 2)) {
-                                if (this.$confirm("请对也仅对小数位后一位进行打分！或超出分数上限")) {
-                                    ref.value = '';
-                                } else {
-                                }
+                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit) || (ref.value.indexOf('.') == -1 || ref.value.substring(ref.value.indexOf("."), ref.value.length).length == 1 )) {
+                                this.$alert("请对也仅对小数位后一位进行打分！或超出分数上限");
+                                ref.value = '';
                                 return
                             } else {
                                 if ((index + 1) % this.tableDates.factor.length == 0) {
@@ -395,11 +389,9 @@
                                 }
                             }
                         } else {
-                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit)) {
-                                if (this.$confirm("超出分数上限")) {
-                                    ref.value = '';
-                                } else {
-                                }
+                            if (Number(ref.value) > parseInt(this.tableDates.factor[index].toplimit)||ref.value.indexOf('.') != -1) {
+                                this.$alert("输入格式错误");
+                                ref.value = '';
                                 return
                             } else {
                                 if ((index + 1) % this.tableDates.factor.length == 0) {
@@ -653,7 +645,6 @@
                             this.DialogGroup.examineeName = docs[0][examineeName];
                             this.DialogGroup.examineeIdCard = docs[0][examineeIdCard];
                             this.DialogGroup.group = docs[0][postGroup];
-                            console.log(docs);
                             this.SaveData.Achievement = docs[0];
                             //控制模态框中考生信息显示与否
                             if (this.DialogGroup.examineeName != '' && this.DialogGroup.examineeIdCard != '') {
