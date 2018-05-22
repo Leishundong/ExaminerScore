@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'electron-desktop',
+    name: 'Score',
       // created(){
       //     this.$db.find({},(err,docs)=>{
       //         console.log(docs)

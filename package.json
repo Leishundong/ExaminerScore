@@ -18,7 +18,7 @@
   },
   "build": {
     "productName": "面试计分系统",
-    "appId": "org.simulatedgreg.electron-vue",
+    "appId": "org.simulatedgreg.electron-aaa",
     "directories": {
       "output": "build"
     },
