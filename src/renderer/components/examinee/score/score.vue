@@ -359,7 +359,7 @@
                                 {
                                     ref.value = ref.value+'.';
                                 }
-                            },400);
+                            },500);
                         }
                     }else {
                         this.$alert('请输入数字');
